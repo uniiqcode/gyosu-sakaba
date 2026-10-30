@@ -1,0 +1,258 @@
+<title>業スー酒場</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく */
+:root {
+  --bg: #EEEDE7;        /* 漆喰の壁 */
+  --fg: #1E1F24;        /* 墨 */
+  --muted: #676A72;
+  --line: #D6D4CB;
+  --ai: #1F3A5F;        /* 藍ののれん */
+  --ai-fg: #F4F2EC;
+  --shu: #B8402B;       /* 朱の「新」 */
+  --paper: #FBFAF5;     /* 短冊の紙 */
+  --ink: #1E1F24;
+  --chip: #E3E1D8;
+  --chip-on: #1F3A5F;
+  --chip-on-fg: #F4F2EC;
+  --brush: "Yuji Syuku", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
+  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
+  --paper: #E9E4D6; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
+  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
+  --paper: #E9E4D6; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.7 }
+a { color: inherit }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+
+/* のれん */
+.noren { background: var(--ai); color: var(--ai-fg) }
+.noren .wrap { padding-block: 0 18px; display: grid; gap: 10px }
+.panels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 420px }
+.panels span { font-family: var(--brush); font-size: clamp(30px, 8vw, 46px); line-height: 1; text-align: center;
+  padding: 22px 0 18px; border-left: 1px solid color-mix(in srgb, var(--ai-fg) 18%, transparent) }
+.panels span:first-child { border-left: 0 }
+.sub { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; opacity: .92 }
+.sub b { font-weight: 500; font-size: 15px }
+
+.proto { font-size: 12px; color: var(--muted); padding-block: 10px 0 }
+
+section { padding-block: 28px 4px }
+h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4px; text-wrap: balance }
+.lead { color: var(--muted); font-size: 13px; margin: 0 0 16px }
+
+/* 短冊 */
+.tz { background: var(--paper); color: var(--ink); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); position: relative; text-decoration: none;
+  display: flex; flex-direction: column; align-items: center }
+.tz .name { writing-mode: vertical-rl; font-family: var(--brush); color: var(--ink); line-height: 1.25; letter-spacing: .04em }
+.tz:focus-visible, .chip:focus-visible, .tab:focus-visible, .row a:focus-visible, .btn:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
+.stamp { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shu);
+  color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
+
+/* 今日の1品 */
+.today { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start }
+.today .tz { width: 118px; min-height: 400px; padding: 12px 0 16px; gap: 12px }
+.today .tz .name { font-size: 26px; max-height: 350px }
+.today .info { display: grid; gap: 10px; min-width: 0 }
+.today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
+.today .dish { font-family: var(--brush); font-size: 28px; line-height: 1.3; margin: 0; text-wrap: balance }
+.orig { font-size: 13px; color: var(--muted); overflow-wrap: anywhere }
+.btn { justify-self: start; display: inline-flex; gap: 8px; align-items: center; background: var(--ai); color: var(--ai-fg);
+  text-decoration: none; padding: 10px 18px; font-weight: 500; border-radius: 2px }
+@media (max-width: 520px) { .today { grid-template-columns: 1fr } .today .tz { width: 100%; min-height: 0; padding: 18px 12px }
+  .today .tz .name { writing-mode: horizontal-tb; font-size: 26px; max-height: none } }
+
+/* 札 */
+.tags { display: flex; flex-wrap: wrap; gap: 6px }
+.tag { font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); color: var(--fg); background: transparent; white-space: nowrap }
+.tag.sec { border-color: var(--fg) }
+.tag.hit { border-color: var(--shu); color: var(--shu) }
+.tag.off { background: var(--fg); color: var(--bg); border-color: var(--fg) }
+
+/* 新着の壁 */
+.wall { overflow-x: auto; padding-bottom: 8px; direction: rtl }
+.wall li { direction: ltr }
+.wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; width: max-content }
+.wall .tz { width: 76px; height: 310px; padding: 10px 0 10px; gap: 8px; justify-content: space-between }
+.wall .tz .name { font-size: 17px; max-height: 240px; flex: 1 }
+.wall .tz .d { font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
+.wall .tz:hover { transform: translateY(-2px) }
+@media (prefers-reduced-motion: no-preference) { .wall .tz { transition: transform .15s } }
+
+/* 品書きのタブ */
+.tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 2px solid var(--fg) }
+.tab { font: inherit; font-family: var(--brush); font-size: 19px; background: none; border: 0; color: var(--fg); padding: 8px 14px 6px; cursor: pointer }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg) }
+.tab .n { font-family: var(--body); font-size: 11px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
+.tab.special { color: var(--shu) }
+.tab.special[aria-selected="true"] { background: var(--shu); color: var(--paper) }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-block: 12px; font-size: 13px }
+.filters .lbl { color: var(--muted); margin-right: 4px }
+.chip { font: inherit; font-size: 13px; background: var(--chip); color: var(--fg); border: 0; padding: 4px 12px; border-radius: 999px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-fg) }
+.chip.hitote[aria-pressed="true"] { background: var(--shu); color: var(--paper) }
+
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line) }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center }
+.row .main { min-width: 0; display: grid; gap: 4px }
+.row .dish { font-weight: 700; font-size: 16px }
+.row a { text-decoration: none; display: grid; gap: 2px; min-width: 0 }
+.row a:hover .dish { text-decoration: underline; text-underline-offset: 3px }
+.row .src { font-size: 12px; color: var(--muted); white-space: nowrap; text-align: right }
+.empty { color: var(--muted); padding: 16px 0 }
+
+.seas-head { font-family: var(--brush); font-size: 21px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
+.seas-head small { font-family: var(--body); font-size: 12px; color: var(--muted) }
+
+footer { margin-top: 40px; border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 13px; color: var(--muted) }
+footer p { margin: 0 0 6px }
+</style>
+
+<header class="noren">
+  <div class="wrap">
+    <div class="panels" aria-label="業スー酒場"><span>業</span><span>ス</span><span>ー</span><span>酒</span><span>場</span></div>
+    <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理のレシピへのリンク集（非公式）</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="proto">試作の画面です。リンクは試しに集めた実際のページですが、公開日は並べ方を見るための仮の日付です。</p>
+
+  <section aria-labelledby="h-today">
+    <h2 id="h-today">今日の一品</h2>
+    <div class="today" id="today"></div>
+  </section>
+
+  <section aria-labelledby="h-new">
+    <h2 id="h-new">新着</h2>
+    <p class="lead">この10日間に貼った短冊です。右がいちばん新しい品です。</p>
+    <div class="wall"><ol id="wall"></ol></div>
+  </section>
+
+  <section aria-labelledby="h-menu">
+    <h2 id="h-menu">品書き</h2>
+    <p class="lead">料理の種類から選び、仕入れる食材で絞り込めます。</p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="filters" id="filters"></div>
+    <div id="menu"></div>
+  </section>
+
+  <section aria-labelledby="h-set">
+    <h2 id="h-set">まとめて見る</h2>
+    <p class="lead">1本の動画・記事に何品も入っているものです。</p>
+    <ul class="list" id="sets"></ul>
+  </section>
+
+  <footer>
+    <p>業務スーパー（株式会社神戸物産）とは関係のない、非公式のページです。</p>
+    <p>レシピは各リンク先のページに載っています。このページには料理名とリンクだけを載せています。</p>
+  </footer>
+</main>
+
+<script>
+const ITEMS = __DATA__;
+const TODAY = "2026-10-30";
+const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
+const SEAS_TAB = "調味料が主役";
+const GROUPS = ["肉", "魚介", "野菜", "豆腐・大豆・こんにゃく", "冷凍惣菜・加工品", "調味料", "麺・粉もの"];
+const SRC = { youtube: "YouTube", blog: "ブログ", web: "記事" };
+
+const ones = ITEMS.filter(x => x.kind === "one").sort((a, b) => b.date.localeCompare(a.date));
+const sets = ITEMS.filter(x => x.kind === "set");
+const daysAgo = d => Math.round((new Date(TODAY) - new Date(d)) / 864e5);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = d => { const [, m, day] = d.split("-"); return `${+m}月${+day}日`; };
+const srcLabel = x => (x.official ? "公式 " : "") + SRC[x.source];
+
+function tags(x, withSec = true) {
+  let h = "";
+  if (withSec) h += `<span class="tag sec">${esc(x.section)}</span>`;
+  h += `<span class="tag">${esc(x.item_group)}</span>`;
+  if (x.seasoning) h += `<span class="tag hit">${esc(x.seasoning)}</span>`;
+  if (x.hitote) h += `<span class="tag hit">ひと手間</span>`;
+  if (x.official) h += `<span class="tag off">公式</span>`;
+  return `<div class="tags">${h}</div>`;
+}
+
+// 今日の一品
+const t = ones[0];
+document.getElementById("today").innerHTML = `
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${esc(t.dish)}</span></a>
+  <div class="info">
+    <div class="date">${fmt(t.date)}の一品・${esc(t.gyosu_item)}</div>
+    <p class="dish">${esc(t.dish)}</p>
+    ${tags(t)}
+    <div class="orig">${esc(t.title)}</div>
+    <a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
+  </div>`;
+
+// 新着（10日以内）
+document.getElementById("wall").innerHTML = ones.filter(x => daysAgo(x.date) < 10).map(x => `
+  <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
+    <span class="stamp">新</span><span class="name">${esc(x.dish)}</span><span class="d">${fmt(x.date)}</span></a></li>`).join("");
+
+// 品書き
+let tab = SECTIONS[0], group = null, hitoteOnly = false;
+const inTab = (x, tb) => tb === SEAS_TAB ? !!x.seasoning : x.section === tb && x.kind === "one";
+const pool = tb => tb === SEAS_TAB ? ITEMS.filter(x => x.seasoning) : ones;
+
+function renderTabs() {
+  const all = [...SECTIONS, SEAS_TAB];
+  document.getElementById("tabs").innerHTML = all.map(tb => {
+    const n = pool(tb).filter(x => inTab(x, tb)).length;
+    return `<button class="tab${tb === SEAS_TAB ? " special" : ""}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}">${tb}<span class="n">${n}</span></button>`;
+  }).join("");
+}
+function renderFilters() {
+  if (tab === SEAS_TAB) { document.getElementById("filters").innerHTML = `<span class="lbl">業務スーパーの調味料ごとに並べています</span>`; return; }
+  const base = ones.filter(x => inTab(x, tab));
+  const gs = GROUPS.filter(g => base.some(x => x.item_group === g));
+  document.getElementById("filters").innerHTML = `<span class="lbl">仕入れ</span>` +
+    `<button class="chip" id="g-all" aria-pressed="${group === null}" data-g="">すべて</button>` +
+    gs.map((g, i) => `<button class="chip" id="g-${i}" aria-pressed="${group === g}" data-g="${g}">${g}</button>`).join("") +
+    `<button class="chip hitote" id="g-hitote" aria-pressed="${hitoteOnly}" data-h="1">ひと手間だけ</button>`;
+}
+const row = (x, withSec) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
+  <span class="dish">${esc(x.dish)}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
+  <div class="src">${srcLabel(x)}${x.date ? `<br>${fmt(x.date)}` : ""}</div></li>`;
+
+function renderMenu() {
+  const el = document.getElementById("menu");
+  if (tab === SEAS_TAB) {
+    const by = {};
+    ITEMS.filter(x => x.seasoning).forEach(x => (by[x.seasoning] ||= []).push(x));
+    el.innerHTML = Object.entries(by).sort((a, b) => b[1].length - a[1].length).map(([s, xs]) =>
+      `<div class="seas-head">${esc(s)}<small>${xs.length}件</small></div><ul class="list">${xs.map(x => row(x, true)).join("")}</ul>`).join("");
+    return;
+  }
+  const xs = ones.filter(x => inTab(x, tab) && (!group || x.item_group === group) && (!hitoteOnly || x.hitote));
+  el.innerHTML = xs.length ? `<ul class="list">${xs.map(x => row(x, false)).join("")}</ul>` : `<p class="empty">この組み合わせの品はまだありません。</p>`;
+}
+function render() { renderTabs(); renderFilters(); renderMenu(); }
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-tab]"); if (!b) return;
+  tab = b.dataset.tab; group = null; hitoteOnly = false; render();
+});
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.h) hitoteOnly = !hitoteOnly; else group = b.dataset.g || null;
+  renderFilters(); renderMenu();
+});
+render();
+
+// まとめて見る
+document.getElementById("sets").innerHTML = sets.map(x => row(x, false)).join("");
+</script>

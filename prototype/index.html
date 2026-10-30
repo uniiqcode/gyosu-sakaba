@@ -1,0 +1,258 @@
+<title>業スー酒場</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく */
+:root {
+  --bg: #EEEDE7;        /* 漆喰の壁 */
+  --fg: #1E1F24;        /* 墨 */
+  --muted: #676A72;
+  --line: #D6D4CB;
+  --ai: #1F3A5F;        /* 藍ののれん */
+  --ai-fg: #F4F2EC;
+  --shu: #B8402B;       /* 朱の「新」 */
+  --paper: #FBFAF5;     /* 短冊の紙 */
+  --ink: #1E1F24;
+  --chip: #E3E1D8;
+  --chip-on: #1F3A5F;
+  --chip-on-fg: #F4F2EC;
+  --brush: "Yuji Syuku", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
+  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
+  --paper: #E9E4D6; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
+  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
+  --paper: #E9E4D6; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.7 }
+a { color: inherit }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+
+/* のれん */
+.noren { background: var(--ai); color: var(--ai-fg) }
+.noren .wrap { padding-block: 0 18px; display: grid; gap: 10px }
+.panels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 420px }
+.panels span { font-family: var(--brush); font-size: clamp(30px, 8vw, 46px); line-height: 1; text-align: center;
+  padding: 22px 0 18px; border-left: 1px solid color-mix(in srgb, var(--ai-fg) 18%, transparent) }
+.panels span:first-child { border-left: 0 }
+.sub { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; opacity: .92 }
+.sub b { font-weight: 500; font-size: 15px }
+
+.proto { font-size: 12px; color: var(--muted); padding-block: 10px 0 }
+
+section { padding-block: 28px 4px }
+h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4px; text-wrap: balance }
+.lead { color: var(--muted); font-size: 13px; margin: 0 0 16px }
+
+/* 短冊 */
+.tz { background: var(--paper); color: var(--ink); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); position: relative; text-decoration: none;
+  display: flex; flex-direction: column; align-items: center }
+.tz .name { writing-mode: vertical-rl; font-family: var(--brush); color: var(--ink); line-height: 1.25; letter-spacing: .04em }
+.tz:focus-visible, .chip:focus-visible, .tab:focus-visible, .row a:focus-visible, .btn:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
+.stamp { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shu);
+  color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
+
+/* 今日の1品 */
+.today { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start }
+.today .tz { width: 118px; min-height: 400px; padding: 12px 0 16px; gap: 12px }
+.today .tz .name { font-size: 26px; max-height: 350px }
+.today .info { display: grid; gap: 10px; min-width: 0 }
+.today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
+.today .dish { font-family: var(--brush); font-size: 28px; line-height: 1.3; margin: 0; text-wrap: balance }
+.orig { font-size: 13px; color: var(--muted); overflow-wrap: anywhere }
+.btn { justify-self: start; display: inline-flex; gap: 8px; align-items: center; background: var(--ai); color: var(--ai-fg);
+  text-decoration: none; padding: 10px 18px; font-weight: 500; border-radius: 2px }
+@media (max-width: 520px) { .today { grid-template-columns: 1fr } .today .tz { width: 100%; min-height: 0; padding: 18px 12px }
+  .today .tz .name { writing-mode: horizontal-tb; font-size: 26px; max-height: none } }
+
+/* 札 */
+.tags { display: flex; flex-wrap: wrap; gap: 6px }
+.tag { font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); color: var(--fg); background: transparent; white-space: nowrap }
+.tag.sec { border-color: var(--fg) }
+.tag.hit { border-color: var(--shu); color: var(--shu) }
+.tag.off { background: var(--fg); color: var(--bg); border-color: var(--fg) }
+
+/* 新着の壁 */
+.wall { overflow-x: auto; padding-bottom: 8px; direction: rtl }
+.wall li { direction: ltr }
+.wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; width: max-content }
+.wall .tz { width: 76px; height: 310px; padding: 10px 0 10px; gap: 8px; justify-content: space-between }
+.wall .tz .name { font-size: 17px; max-height: 240px; flex: 1 }
+.wall .tz .d { font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
+.wall .tz:hover { transform: translateY(-2px) }
+@media (prefers-reduced-motion: no-preference) { .wall .tz { transition: transform .15s } }
+
+/* 品書きのタブ */
+.tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 2px solid var(--fg) }
+.tab { font: inherit; font-family: var(--brush); font-size: 19px; background: none; border: 0; color: var(--fg); padding: 8px 14px 6px; cursor: pointer }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg) }
+.tab .n { font-family: var(--body); font-size: 11px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
+.tab.special { color: var(--shu) }
+.tab.special[aria-selected="true"] { background: var(--shu); color: var(--paper) }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-block: 12px; font-size: 13px }
+.filters .lbl { color: var(--muted); margin-right: 4px }
+.chip { font: inherit; font-size: 13px; background: var(--chip); color: var(--fg); border: 0; padding: 4px 12px; border-radius: 999px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-fg) }
+.chip.hitote[aria-pressed="true"] { background: var(--shu); color: var(--paper) }
+
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line) }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center }
+.row .main { min-width: 0; display: grid; gap: 4px }
+.row .dish { font-weight: 700; font-size: 16px }
+.row a { text-decoration: none; display: grid; gap: 2px; min-width: 0 }
+.row a:hover .dish { text-decoration: underline; text-underline-offset: 3px }
+.row .src { font-size: 12px; color: var(--muted); white-space: nowrap; text-align: right }
+.empty { color: var(--muted); padding: 16px 0 }
+
+.seas-head { font-family: var(--brush); font-size: 21px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
+.seas-head small { font-family: var(--body); font-size: 12px; color: var(--muted) }
+
+footer { margin-top: 40px; border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 13px; color: var(--muted) }
+footer p { margin: 0 0 6px }
+</style>
+
+<header class="noren">
+  <div class="wrap">
+    <div class="panels" aria-label="業スー酒場"><span>業</span><span>ス</span><span>ー</span><span>酒</span><span>場</span></div>
+    <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理のレシピへのリンク集（非公式）</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="proto">試作の画面です。リンクは試しに集めた実際のページですが、公開日は並べ方を見るための仮の日付です。</p>
+
+  <section aria-labelledby="h-today">
+    <h2 id="h-today">今日の一品</h2>
+    <div class="today" id="today"></div>
+  </section>
+
+  <section aria-labelledby="h-new">
+    <h2 id="h-new">新着</h2>
+    <p class="lead">この10日間に貼った短冊です。右がいちばん新しい品です。</p>
+    <div class="wall"><ol id="wall"></ol></div>
+  </section>
+
+  <section aria-labelledby="h-menu">
+    <h2 id="h-menu">品書き</h2>
+    <p class="lead">料理の種類から選び、仕入れる食材で絞り込めます。</p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="filters" id="filters"></div>
+    <div id="menu"></div>
+  </section>
+
+  <section aria-labelledby="h-set">
+    <h2 id="h-set">まとめて見る</h2>
+    <p class="lead">1本の動画・記事に何品も入っているものです。</p>
+    <ul class="list" id="sets"></ul>
+  </section>
+
+  <footer>
+    <p>業務スーパー（株式会社神戸物産）とは関係のない、非公式のページです。</p>
+    <p>レシピは各リンク先のページに載っています。このページには料理名とリンクだけを載せています。</p>
+  </footer>
+</main>
+
+<script>
+const ITEMS = [{"source": "youtube", "title": "【ちょこっとおつまみ】 業務スーパー冷凍肉団子アレンジ❇️お弁当にもおつまみにも‼️", "url": "https://www.youtube.com/watch?v=yoFGfKtSnQM", "gyosu_item": "冷凍肉団子", "item_group": "冷凍惣菜・加工品", "dish": "肉団子のバター醤油焼き", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-10-30"}, {"source": "youtube", "title": "【業務スーパー】レトルト中華丼の素で作る、簡単、あんかけ焼きそば‼️追いキクラゲがうめぇ‼️", "url": "https://www.youtube.com/watch?v=UAuS2829o70", "gyosu_item": "中華丼の素", "item_group": "冷凍惣菜・加工品", "dish": "あんかけ焼きそば", "section": "〆", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-10-29"}, {"source": "youtube", "title": "【簡単作り置き】業務用スーパーで買った鶏むね肉2キロを使って大量サラダチキン作り！！", "url": "https://www.youtube.com/watch?v=-zIjKE-FRfs", "gyosu_item": "鶏むね肉2kg", "item_group": "肉", "dish": "サラダチキン", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-28"}, {"source": "youtube", "title": "【業務スーパー】鶏むね肉2kg下処理&冷凍保存、豚軟骨の作り方【夫婦でスーパー帰宅後ルーティン】", "url": "https://www.youtube.com/watch?v=nU9BxoZXJZo", "gyosu_item": "鶏むね肉・豚軟骨", "item_group": "肉", "dish": "豚軟骨の煮込み", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-27"}, {"source": "youtube", "title": "白身魚の中華甘酢あんかけ｜業務スーパーミラクルレシピ", "url": "https://www.youtube.com/watch?v=6fa6eysVRm8", "gyosu_item": "中華甘酢あん・白身魚", "item_group": "調味料", "dish": "白身魚の甘酢あんかけ", "section": "揚げ物", "kind": "one", "seasoning": "中華甘酢あん", "hitote": false, "official": true, "date": "2026-10-26"}, {"source": "youtube", "title": "【業務スーパー商品】仕込み０。冷凍野菜と豚肉で簡単おかずレシピ", "url": "https://www.youtube.com/watch?v=PF_0FDaAQcI", "gyosu_item": "冷凍野菜", "item_group": "野菜", "dish": "冷凍野菜と豚肉の炒め物", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-25"}, {"source": "youtube", "title": "【BBQ】業務スーパーの冷凍スルメイカ短冊を炭焼きおつまみ！！ビールすすむぅー！！", "url": "https://www.youtube.com/watch?v=ktsjTcC6b8c", "gyosu_item": "冷凍スルメイカ短冊", "item_group": "魚介", "dish": "イカの炭焼き", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-24"}, {"source": "youtube", "title": "【業務スーパー】大人気やわらか煮豚を炙って丼にして食べよう 簡単クッキング", "url": "https://www.youtube.com/watch?v=9YWqQbUZ3Ow", "gyosu_item": "やわらか煮豚", "item_group": "冷凍惣菜・加工品", "dish": "炙り煮豚丼", "section": "〆", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-10-23"}, {"source": "youtube", "title": "魚介とトマトのジュレサラダ｜業務スーパーミラクルレシピ", "url": "https://www.youtube.com/shorts/Z19ea4NQedE", "gyosu_item": "パスタソース・たこ・えび", "item_group": "魚介", "dish": "魚介とトマトのジュレサラダ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": true, "date": "2026-10-22"}, {"source": "youtube", "title": "業務スーパー等 冷凍赤魚 煮付け 作り方☆下処理してプロ級に美味しく仕上げる方法", "url": "https://www.youtube.com/watch?v=43TISq8RVk8", "gyosu_item": "冷凍赤魚", "item_group": "魚介", "dish": "赤魚の煮付け", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-21"}, {"source": "youtube", "title": "業スー本気の白身フライ｜業務スーパー", "url": "https://www.youtube.com/shorts/r6vzVGReviE", "gyosu_item": "冷凍白身フライ", "item_group": "冷凍惣菜・加工品", "dish": "白身フライ", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": true, "official": true, "date": "2026-10-20"}, {"source": "youtube", "title": "【業務スーパー】豆板醬厚揚げレシピ 超うまい！時短料理＆炒めるだけ", "url": "https://www.youtube.com/watch?v=Q7bjWWntzQY", "gyosu_item": "厚揚げ・豆板醤", "item_group": "豆腐・大豆・こんにゃく", "dish": "厚揚げとセロリの豆板醤炒め", "section": "炒め物", "kind": "one", "seasoning": "豆板醤", "hitote": false, "official": false, "date": "2026-10-19"}, {"source": "youtube", "title": "【業務スーパー】包んでレンジで完成！？使う材料は3つだけ超簡単ブリト―【おやつにピッタリ】", "url": "https://www.youtube.com/watch?v=SiCGlBglrMQ", "gyosu_item": "冷凍トルティーヤ", "item_group": "麺・粉もの", "dish": "ハムチーズのブリトー", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-18"}, {"source": "youtube", "title": "【業務スーパー商品】コスパ最強！！簡単The皿うどんの作り方", "url": "https://www.youtube.com/watch?v=f01Dtpcaf7M", "gyosu_item": "皿うどん", "item_group": "麺・粉もの", "dish": "皿うどん", "section": "〆", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-17"}, {"source": "youtube", "title": "【レンジで簡単おかず】業務スーパーの冷凍揚げなすを使うから包丁いらず☆無限ナスの南蛮漬け作るよ", "url": "https://www.youtube.com/shorts/8yWuhT1qSUc", "gyosu_item": "冷凍揚げなす", "item_group": "野菜", "dish": "なすの南蛮漬け", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-16"}, {"source": "youtube", "title": "業務スーパーの豚バラブロック1キロで豚の角煮 // 圧力鍋 // 簡単レシピ", "url": "https://www.youtube.com/watch?v=2gnN46pvwoI", "gyosu_item": "豚バラブロック1kg", "item_group": "肉", "dish": "豚の角煮", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-15"}, {"source": "youtube", "title": "業務スーパーの2kg冷凍鶏もも肉で唐揚げドカ食い【ずんだもん/料理】", "url": "https://www.youtube.com/watch?v=akJ-R8w2OXU", "gyosu_item": "鶏もも肉2kg", "item_group": "肉", "dish": "唐揚げ3種", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-14"}, {"source": "youtube", "title": "【業務スーパー】冷凍揚げ茄子レシピ‼️ ごはんが進む、揚げ茄子大葉そぼろ味噌炒め‼️", "url": "https://www.youtube.com/watch?v=SK817DlCYqc", "gyosu_item": "冷凍揚げなす", "item_group": "野菜", "dish": "揚げなすの大葉そぼろ味噌炒め", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-13"}, {"source": "youtube", "title": "【ローストチキン】クリスマスだけでは勿体無い！ニンニク香るパリッと食感。業務スーパーの丸鶏で丸焼きチキン", "url": "https://www.youtube.com/watch?v=kooNjZtYnKw", "gyosu_item": "丸鶏", "item_group": "肉", "dish": "ローストチキン", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-12"}, {"source": "blog", "title": "「業務スーパー」冷凍うどん最強説！包丁いらずで秒速完成「悪魔的に旨いうどんアレンジ」3選！", "url": "https://note.com/grand_arnica8909/n/n3c02435dbba5", "gyosu_item": "冷凍うどん", "item_group": "麺・粉もの", "dish": "明太バターうどんほか3品", "section": "〆", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-11"}, {"source": "youtube", "title": "【業務スーパー】暑いときのご飯のお供！！揚げナスのさっぱり揚げびたし【簡単常備菜】", "url": "https://www.youtube.com/watch?v=Xlgf_vXhA6A", "gyosu_item": "冷凍揚げなす", "item_group": "野菜", "dish": "揚げなすの揚げびたし", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-10"}, {"source": "youtube", "title": "業務スーパーの豚バラブロック//炊飯器で簡単煮豚 // ほったらかしレシピ // 簡単レシピ", "url": "https://www.youtube.com/watch?v=YCYdwhN1t8Q", "gyosu_item": "豚バラブロック", "item_group": "肉", "dish": "炊飯器の煮豚", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-09"}, {"source": "youtube", "title": "【業務スーパー】冷凍から揚げアレンジ！甘じょっぱさが癖になるタレ漬けから揚げ【簡単一品】", "url": "https://www.youtube.com/watch?v=29VXRZAH_Q0", "gyosu_item": "冷凍から揚げ", "item_group": "冷凍惣菜・加工品", "dish": "タレ漬けから揚げ", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-10-08"}, {"source": "blog", "title": "業務スーパー　トムヤムペースト　アレンジレシピ", "url": "https://ameblo.jp/baronmamadesu/entry-12935897773.html", "gyosu_item": "トムヤムペースト", "item_group": "調味料", "dish": "トムヤムの炒め物・えび料理", "section": "炒め物", "kind": "one", "seasoning": "トムヤム", "hitote": false, "official": false, "date": "2026-10-07"}, {"source": "youtube", "title": "【業務スーパー】冷凍骨なし赤魚レシピ‼️ これ骨がないので使いやすいです❇️", "url": "https://www.youtube.com/watch?v=aq_hdsWlIKo", "gyosu_item": "冷凍骨なし赤魚", "item_group": "魚介", "dish": "赤魚のオーロラソースソテー", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-06"}, {"source": "blog", "title": "【業務スーパー】1kgの鶏ひき肉を使い切り‼︎① / 簡単‼︎和風ガパオライス", "url": "https://ameblo.jp/noripetit/entry-12902636223.html", "gyosu_item": "鶏ひき肉1kg", "item_group": "肉", "dish": "和風ガパオライス", "section": "〆", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-05"}, {"source": "blog", "title": "業務スーパーの底力？！じゃがいもはもう剥かなくていい！ポテトサラダが優勝した話", "url": "https://note.com/mogmog_cika/n/n56b527956c2c", "gyosu_item": "冷凍じゃがいも", "item_group": "野菜", "dish": "ポテトサラダ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-04"}, {"source": "youtube", "title": "やわらか煮豚｜業務スーパー", "url": "https://www.youtube.com/shorts/tiayQmAz_gk", "gyosu_item": "やわらか煮豚", "item_group": "冷凍惣菜・加工品", "dish": "やわらか煮豚", "section": "煮物", "kind": "one", "seasoning": null, "hitote": true, "official": true, "date": "2026-10-03"}, {"source": "youtube", "title": "【3ステップ】梅と青じのテンペ揚げ｜業務スーパーミラクルレシピ", "url": "https://www.youtube.com/watch?v=B5M9XJ5y91U", "gyosu_item": "テンペ", "item_group": "豆腐・大豆・こんにゃく", "dish": "梅と青じそのテンペ揚げ", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": false, "official": true, "date": "2026-10-02"}, {"source": "blog", "title": "☆業務スーパー商品アレンジレシピ☆ヒルナンデスで紹介！冷凍野菜の揚げなす乱切り", "url": "https://ameblo.jp/mayutearoom/entry-12548859623.html", "gyosu_item": "冷凍揚げなす", "item_group": "野菜", "dish": "揚げなすの肉味噌炒めほか", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-10-01"}, {"source": "youtube", "title": "【おうちごはん】業務スーパー冷凍赤魚レシピ‼️ 赤魚海苔佃煮餡‼️", "url": "https://www.youtube.com/watch?v=yDC56eq4NC0", "gyosu_item": "冷凍赤魚", "item_group": "魚介", "dish": "赤魚の海苔佃煮あん", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-30"}, {"source": "web", "title": "冷蔵庫にストックしたい! アレンジ自在の業務スーパーのうどん", "url": "https://ichioshi.smt.docomo.ne.jp/articles/common/486897", "gyosu_item": "うどん", "item_group": "麺・粉もの", "dish": "うどんのアレンジ", "section": "〆", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-29"}, {"source": "blog", "title": "【レシピ】業務スーパー食材だけで作る簡単海藻春雨サラダ｜お好みドレッシングでアレンジ可", "url": "https://i-take-cooking.hateblo.jp/entry/2026/03/18/174335", "gyosu_item": "春雨・海藻サラダ", "item_group": "麺・粉もの", "dish": "海藻春雨サラダ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-28"}, {"source": "youtube", "title": "【業務スーパー】冷凍和風野菜ミックス❇️簡単に筑前煮✴️", "url": "https://www.youtube.com/watch?v=e3_auHtGgTU", "gyosu_item": "冷凍和風野菜ミックス", "item_group": "野菜", "dish": "筑前煮", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-27"}, {"source": "blog", "title": "業スーのリピ品で簡単おつまみ", "url": "https://ameblo.jp/mayutearoom/entry-12615742441.html", "gyosu_item": "スモークチキン・春巻きの皮", "item_group": "冷凍惣菜・加工品", "dish": "スモークチキンの大葉チーズ春巻き", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-09-26"}, {"source": "blog", "title": "『業務スーパー産のこんにゃく』de『ちびちび食べる超簡単おつまみ（気付いたら完食しちゃった）』", "url": "https://ameblo.jp/rikajohuchi/entry-12939961601.html", "gyosu_item": "こんにゃく", "item_group": "豆腐・大豆・こんにゃく", "dish": "こんにゃくの甘辛炒め", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-25"}, {"source": "youtube", "title": "業務スーパーの白身魚の切り身を使って…トースターで簡単！白身魚のパン粉焼き", "url": "https://www.youtube.com/watch?v=BK_1BL2TBbE", "gyosu_item": "白身魚の切り身", "item_group": "魚介", "dish": "白身魚のパン粉焼き", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-24"}, {"source": "blog", "title": "【業務スーパー】冷凍アボカドで簡単おつまみ☆", "url": "https://ameblo.jp/sakura-giorni-felici/entry-12877748089.html", "gyosu_item": "冷凍アボカド", "item_group": "野菜", "dish": "アボカドの生ハム和え", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-23"}, {"source": "blog", "title": "カキのコンフィを作ってみた＊業務スーパーの冷凍カキで簡単おつまみ！", "url": "https://note.com/yoko_emi/n/na02645d34965", "gyosu_item": "冷凍カキ", "item_group": "魚介", "dish": "カキのコンフィ", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-22"}, {"source": "blog", "title": "【家メシ】業務スーパーの冷凍「バルト海いわし」がすごい！安くて便利！", "url": "https://note.com/nara_naka/n/n58f1a646fbd9", "gyosu_item": "冷凍バルト海いわし", "item_group": "魚介", "dish": "いわしの揚げ焼き", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-21"}, {"source": "blog", "title": "【業務スーパー】1kgの鶏ひき肉使い切り③あると便利！基本の鶏そぼろ", "url": "https://ameblo.jp/noripetit/entry-12903803037.html", "gyosu_item": "鶏ひき肉1kg", "item_group": "肉", "dish": "鶏そぼろ", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-20"}, {"source": "youtube", "title": "【業務スーパー姜葱醤】豚の生姜焼き、めちゃうま簡単生姜焼き😋", "url": "https://www.youtube.com/watch?v=QOzXjnLbRao", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "豚の生姜焼き", "section": "焼き物", "kind": "one", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": "2026-09-19"}, {"source": "blog", "title": "業務スーパースモーク缶詰でおつまみ第2段", "url": "https://ot-icecream.hatenablog.com/entry/gyomu/sardine", "gyosu_item": "スモーク缶詰", "item_group": "魚介", "dish": "スモーク缶のおつまみ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-18"}, {"source": "blog", "title": "【在宅つまみテク】業務スーパーの『牛赤身スジ肉』で、煮込みながら”宅立呑”を", "url": "https://note.com/teki_kaku/n/n22dd2d914313", "gyosu_item": "牛赤身スジ肉", "item_group": "肉", "dish": "牛すじ煮込み", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-17"}, {"source": "blog", "title": "【業務スーパー】冷凍のさわらのレシピ 身はふっくら さわらの塩焼きサクサクの衣が香ばしい さわらの竜田揚げ", "url": "https://ql.hatenablog.com/entry/20251030/1761814631", "gyosu_item": "冷凍さわら", "item_group": "魚介", "dish": "さわらの塩焼き・竜田揚げ", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-16"}, {"source": "blog", "title": "【業務スーパー】姜葱醬に漬け込み、鶏むね肉の甘辛炒め", "url": "https://ameblo.jp/masamiongaku/entry-12883679566.html", "gyosu_item": "姜葱醤・鶏むね肉", "item_group": "調味料", "dish": "鶏むねの甘辛炒め", "section": "炒め物", "kind": "one", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": "2026-09-15"}, {"source": "youtube", "title": "【業務スーパー】冷凍餃子で蟹あんかけ餃子😋あんが絡んで餃子がワンランクアップ‼️", "url": "https://www.youtube.com/watch?v=b-jM8_Lb53Y", "gyosu_item": "冷凍水餃子", "item_group": "冷凍惣菜・加工品", "dish": "蟹あんかけ餃子", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-09-14"}, {"source": "blog", "title": "【レシピあり】鶏肉買ったらコレ作って！無限にいけちゃう\"蒸し鶏の甘辛漬け\"【タッパー】", "url": "https://patte-de-lapin.hatenablog.jp/entry/2024/07/08/170000", "gyosu_item": "鶏もも肉2kg", "item_group": "肉", "dish": "蒸し鶏の甘辛漬け", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-13"}, {"source": "blog", "title": "【業務スーパー】さっぱりヘルシー！鶏むね肉のみぞれ煮", "url": "https://ameblo.jp/makorin-to-penko/entry-12748290663.html", "gyosu_item": "鶏むね肉", "item_group": "肉", "dish": "鶏むねのみぞれ煮", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-12"}, {"source": "web", "title": "業務スーパー「冷凍 鶏のから揚げ」は1個約17円!あっさり薄衣でアレンジ自在", "url": "https://ichioshi.smt.docomo.ne.jp/articles/common/487131", "gyosu_item": "冷凍鶏のから揚げ", "item_group": "冷凍惣菜・加工品", "dish": "から揚げのアレンジ", "section": "揚げ物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-09-11"}, {"source": "blog", "title": "業務スーパーの鶏むね肉で簡単節約レシピ♪甘酢マヨでやわらか絶品おかず", "url": "https://ameblo.jp/moon7dream/entry-12959325506.html", "gyosu_item": "鶏むね肉", "item_group": "肉", "dish": "鶏むねの甘酢マヨ炒め", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-10"}, {"source": "youtube", "title": "呑んべぇが熱狂する厚揚げおつまみ！業務スーパーの材料で完結！簡単節約レシピ", "url": "https://www.youtube.com/watch?v=fIESqcPMzO4", "gyosu_item": "厚揚げ", "item_group": "豆腐・大豆・こんにゃく", "dish": "厚揚げのおつまみ", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-09"}, {"source": "blog", "title": "業スー ワンコインで絶品ユッケ", "url": "https://ameblo.jp/mayutearoom/entry-12597385086.html", "gyosu_item": "不明（ユッケの材料）", "item_group": "肉", "dish": "ユッケ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-08"}, {"source": "blog", "title": "【業務スーパー】冷凍の赤魚の値段が 500g 558円 赤魚のレシピ ご飯のおかずにぴったり 赤魚の煮付け", "url": "https://ql.hatenablog.com/entry/20251103/1762164298", "gyosu_item": "冷凍赤魚", "item_group": "魚介", "dish": "赤魚の煮付け", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-07"}, {"source": "blog", "title": "【業務スーパー】パプリカと鶏もも竜田のナンプラー炒めとカリカリ鶏皮とブロッコリーのサワークリームマヨサラダ【レシピあり】", "url": "https://patte-de-lapin.hatenablog.jp/entry/2024/10/23/170000", "gyosu_item": "鶏もも肉", "item_group": "肉", "dish": "鶏ももナンプラー炒め・鶏皮サラダ", "section": "炒め物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-06"}, {"source": "blog", "title": "業務スーパー 子供と大人のおつまみ レシピ", "url": "https://ameblo.jp/baby-rimam/entry-12597637156.html", "gyosu_item": "オイルサーディン", "item_group": "魚介", "dish": "オイルサーディンのトマトソテー", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-05"}, {"source": "web", "title": "業務スーパーの冷凍「合鴨ロース」がコスパ最強でおすすめ! おいしい食べ方やアレンジレシピ・解凍方法", "url": "https://ichioshi.smt.docomo.ne.jp/articles/common/487301", "gyosu_item": "冷凍合鴨ロース", "item_group": "肉", "dish": "合鴨ロースのアレンジ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-04"}, {"source": "blog", "title": "魚の煮付けを極めるシリーズ エピソード2 （業務スーパー 冷凍赤魚 初代割烹 高橋シェフレシピ）", "url": "https://ameblo.jp/a-ex/entry-12780756502.html", "gyosu_item": "冷凍赤魚", "item_group": "魚介", "dish": "赤魚の煮付け", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-03"}, {"source": "blog", "title": "【実食編】業務スーパーに売っているブラジル産鶏もも肉を麻婆風チキンステーキと照り焼きチキン風で食べてみた！", "url": "https://patte-de-lapin.hatenablog.jp/entry/2024/09/18/170000", "gyosu_item": "ブラジル産鶏もも肉", "item_group": "肉", "dish": "麻婆風チキンステーキ・照り焼き", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-02"}, {"source": "web", "title": "レンチンでできる! マヨネーズとケチャップの黄金比が絶妙な「3分えびマヨ」", "url": "https://ddnavi.com/article/d765068/a/", "gyosu_item": "冷凍むきえび", "item_group": "魚介", "dish": "えびマヨ", "section": "小鉢", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-09-01"}, {"source": "blog", "title": "【業務スーパー】冷凍のタラ切り身の値段が500g498円 実際に食べてみると身は薄いが骨がないのでとても食べやすかった", "url": "https://ql.hatenablog.com/entry/2024/10/22/152950", "gyosu_item": "冷凍タラ切り身", "item_group": "魚介", "dish": "タラのチゲ鍋", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-31"}, {"source": "blog", "title": "☆業務スーパーの鶏むね肉使用☆レンコンつくねの下味冷凍レシピ", "url": "https://ameblo.jp/mayutearoom/entry-12553561998.html", "gyosu_item": "鶏むね肉", "item_group": "肉", "dish": "レンコンつくね", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-30"}, {"source": "blog", "title": "業務スーパーの激安冷凍イワシを使った冬にぴったりなイワシとキャベツのトマト煮込みがご飯にも麺にも相性良すぎた【レシピあり】", "url": "https://patte-de-lapin.hatenablog.jp/entry/2026/01/10/170000", "gyosu_item": "冷凍イワシ", "item_group": "魚介", "dish": "イワシとキャベツのトマト煮込み", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-29"}, {"source": "blog", "title": "【業務スーパー】鯖の切り身の値段はいくら？ 業務スーパーの鯖の切り身を実際に使ってみた感想", "url": "https://ql.hatenablog.com/entry/20251105/1762332778", "gyosu_item": "冷凍鯖切り身", "item_group": "魚介", "dish": "鯖のカレー焼き・焼き鯖の炊き込みご飯", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-28"}, {"source": "blog", "title": "冷凍魚で、と～っても美味しく煮魚を作る方法", "url": "https://ameblo.jp/socchidiary/entry-12649300316.html", "gyosu_item": "冷凍魚", "item_group": "魚介", "dish": "煮魚", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-27"}, {"source": "blog", "title": "【業務スーパー】下の子が興奮して食べたおかず", "url": "https://ameblo.jp/makorin-to-penko/entry-12884779112.html", "gyosu_item": "冷凍焼き鳥・こんにゃく・竹輪", "item_group": "冷凍惣菜・加工品", "dish": "焼き鳥とこんにゃくの甘辛生姜照り焼き", "section": "焼き物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-08-26"}, {"source": "blog", "title": "沸騰したら5分で出来上がり！ 業務スーパーの 水餃子(^^♪", "url": "https://kaatyann.hatenablog.com/entry/2020/10/30/122119", "gyosu_item": "三鮮水餃子", "item_group": "冷凍惣菜・加工品", "dish": "水餃子", "section": "煮物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-08-25"}, {"source": "blog", "title": "業務スーパーの冷凍かぼちゃ！超絶簡単レシピ！！", "url": "https://ameblo.jp/mikankoku-nikki/entry-12677986106.html", "gyosu_item": "冷凍かぼちゃ", "item_group": "野菜", "dish": "かぼちゃの煮物", "section": "煮物", "kind": "one", "seasoning": null, "hitote": false, "official": false, "date": "2026-08-24"}, {"source": "web", "title": "温めるだけ! 業務スーパーの「大入おでん」は時短家事にイチオシ", "url": "https://ichioshi.smt.docomo.ne.jp/articles/common/486914", "gyosu_item": "大入おでん", "item_group": "冷凍惣菜・加工品", "dish": "おでん", "section": "煮物", "kind": "one", "seasoning": null, "hitote": true, "official": false, "date": "2026-08-23"}, {"source": "youtube", "title": "【これが最強】業スーおつまみ10選！【海鮮系から肉系まで！】", "url": "https://www.youtube.com/watch?v=X3XstjRxk1A", "gyosu_item": "冷凍食品いろいろ", "item_group": "冷凍惣菜・加工品", "dish": "おつまみ10品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "youtube", "title": "誰でも絶品おつまみが作れちゃう業務スーパー調味料で晩酌したらうますぎて昇天！", "url": "https://www.youtube.com/watch?v=KSPQtgpsiaI", "gyosu_item": "トムヤムクンペースト・四川豆板醤", "item_group": "調味料", "dish": "手羽先のトムヤム焼きほか", "section": "まとめ", "kind": "set", "seasoning": "トムヤム", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】コスパ最強おつまみとおすすめ商品を料理して食べ飲みする", "url": "https://www.youtube.com/watch?v=jM3j2Vb0AIY", "gyosu_item": "食材いろいろ", "item_group": "いろいろ", "dish": "おつまみいろいろ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【おつまみ】ほぼ毎日晩酌する夫婦のおつまみNO73・業務スーパー購入品でおつまみ作り・メキシカンタコス・ジャーマンポテトニョッキ・鶏肉のパン粉焼き", "url": "https://www.youtube.com/watch?v=93BJNloArto", "gyosu_item": "ニョッキほか", "item_group": "いろいろ", "dish": "タコス・ジャーマンポテトニョッキ・鶏のパン粉焼き", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "家飲みに！！【業務スーパーの商品で】10分で居酒屋献立／みきママ", "url": "https://www.youtube.com/watch?v=V3VJFALhitU", "gyosu_item": "冷凍焼き鳥・タコのから揚げほか", "item_group": "冷凍惣菜・加工品", "dish": "居酒屋献立4品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "youtube", "title": "業スーバレしないおしゃれパーティー料理レシピ｜業務スーパーおすすめ購入品", "url": "https://www.youtube.com/watch?v=at6u_dud_FM", "gyosu_item": "食材いろいろ", "item_group": "いろいろ", "dish": "パーティー料理", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】で売っている食材や中華甘酢あんを使って簡単レシピ6品ご紹介♪", "url": "https://www.youtube.com/watch?v=c4cnOCBFiKg", "gyosu_item": "中華甘酢あん", "item_group": "調味料", "dish": "甘酢あんの料理6品", "section": "まとめ", "kind": "set", "seasoning": "中華甘酢あん", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【おうち居酒屋＃28】業務スーパーの食材をアレンジしたおつまみ4品で乾杯♪", "url": "https://www.youtube.com/watch?v=9SGENxu_HBg", "gyosu_item": "食材いろいろ", "item_group": "いろいろ", "dish": "おつまみ4品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【下味冷凍】業務スーパーの鶏モモ肉2kgで5品！週末30分調理で毎日のごはんづくりがラクになる！【つくりおきレシピ】", "url": "https://www.youtube.com/watch?v=UyqXAJwQdWM", "gyosu_item": "鶏もも肉2kg", "item_group": "肉", "dish": "鶏ももの下味冷凍5品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】鶏むね肉2kg🍗下味冷凍6選！節約レシピ保存版♪", "url": "https://www.youtube.com/watch?v=5lYpjzBBZHU", "gyosu_item": "鶏むね肉2kg", "item_group": "肉", "dish": "鶏むねの下味冷凍6品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】鶏もも肉2kg使い切り！下味冷凍おすすめ５品を作ります！", "url": "https://www.youtube.com/watch?v=AbD6RL5P2FI", "gyosu_item": "鶏もも肉2kg", "item_group": "肉", "dish": "鶏ももの下味冷凍5品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】鶏むね肉2kg使い切り！おすすめ下味冷凍５品作ります！", "url": "https://www.youtube.com/watch?v=YxA0Xyq_-4Y", "gyosu_item": "鶏むね肉2kg", "item_group": "肉", "dish": "鶏むねの下味冷凍5品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【作り置き】冷凍保存できる！豚ひき肉1kgで簡単おかず3品｜業務スーパー", "url": "https://www.youtube.com/watch?v=fgBhzRCdnmE", "gyosu_item": "豚ひき肉1kg", "item_group": "肉", "dish": "肉だんご・つくね・煮込みハンバーグ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": true, "date": ""}, {"source": "youtube", "title": "【作り置き】冷凍保存できる！豚ひき肉1.5kgで簡単おかず4品｜業務スーパー", "url": "https://www.youtube.com/watch?v=dxRyCBFoe2c", "gyosu_item": "豚ひき肉1.5kg", "item_group": "肉", "dish": "ミートソース・肉みそほか", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": true, "date": ""}, {"source": "youtube", "title": "【業務スーパー】冷凍肉団子アレンジ‼️冷凍肉団子で３品紹介🎶", "url": "https://www.youtube.com/watch?v=7DniNE8nR3s", "gyosu_item": "冷凍肉団子", "item_group": "冷凍惣菜・加工品", "dish": "肉団子のアレンジ3品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】プロが選ぶ冷凍野菜おすすめランキング（パート２）〜節約簡単アレンジレシピも紹介！〜", "url": "https://www.youtube.com/watch?v=Kub5v-J6FgQ", "gyosu_item": "冷凍野菜", "item_group": "野菜", "dish": "冷凍野菜のアレンジ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】おすすめのお惣菜/大容量の冷蔵食品を上手に活用・時短/保存方法/アレンジレシピ13品", "url": "https://www.youtube.com/watch?v=QpahiiZibq8", "gyosu_item": "大容量の惣菜", "item_group": "冷凍惣菜・加工品", "dish": "惣菜のアレンジ13品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】新商品？冷凍彩り炒め用野菜ミックスでいろいろ作ります", "url": "https://www.youtube.com/watch?v=ZfYLeyGkNik", "gyosu_item": "冷凍炒め用野菜ミックス", "item_group": "野菜", "dish": "野菜ミックスの料理いろいろ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "業務スーパーの冷凍野菜を使って4品作りました＼(^o^)／", "url": "https://www.youtube.com/watch?v=Oxr4jS2Jqq4", "gyosu_item": "冷凍野菜", "item_group": "野菜", "dish": "冷凍野菜の4品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【簡単レシピ】業務スーパーの唐揚げをアレンジ！簡単＆時短調理で満腹おかずに大変身♪", "url": "https://www.youtube.com/watch?v=iwSeKS6Gj7U", "gyosu_item": "冷凍竜田揚げ", "item_group": "冷凍惣菜・加工品", "dish": "唐揚げのアレンジ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "youtube", "title": "【全レシピ公開】姜葱醤(ｼﾞｬﾝﾂｫﾝｼﾞｬﾝ)に合うシリーズ完全版！業務スーパー姜葱醤の魅力を凝縮！最強調味料使いこなし（全19品）", "url": "https://www.youtube.com/watch?v=Q1h0TUjxpBc", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "姜葱醤の料理19品", "section": "まとめ", "kind": "set", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】ジャンツォンジャン姜葱醤レシピ✴️入れるだけで激ウマ❇️", "url": "https://www.youtube.com/watch?v=gRXwrP8U6lM", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "姜葱醤の料理", "section": "まとめ", "kind": "set", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】万能調味料『姜葱醤』で川越シェフが中華アレンジメニューをご提案！", "url": "https://www.youtube.com/watch?v=ON1x7Lso9yo", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "姜葱醤の中華アレンジ", "section": "まとめ", "kind": "set", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "ぶんぶんしたらレンジでチンするだけ！業務スーパーで大人気の万能調味料【姜葱醤(ジャンツォンジャン)】お家にある材料で簡単に♪", "url": "https://www.youtube.com/watch?v=F2AWVC643Yc", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "姜葱醤のレンジ料理", "section": "まとめ", "kind": "set", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "【業務スーパー】おすすめ調味料🧂姜葱醤(ジャンツォンジャン)を使ったレシピ✌️【料理】", "url": "https://www.youtube.com/watch?v=zOk6F91Pv_o", "gyosu_item": "姜葱醤", "item_group": "調味料", "dish": "姜葱醤の料理", "section": "まとめ", "kind": "set", "seasoning": "姜葱醤", "hitote": false, "official": false, "date": ""}, {"source": "youtube", "title": "食べるおかず調味料 青のにんにく｜業務スーパー", "url": "https://www.youtube.com/shorts/8Q1BBgmAejQ", "gyosu_item": "青のにんにく", "item_group": "調味料", "dish": "青のにんにくの使い方", "section": "まとめ", "kind": "set", "seasoning": "青のにんにく", "hitote": false, "official": true, "date": ""}, {"source": "blog", "title": "業務スーパーの新作惣菜「パスタアラビアータ」を使った簡単アレンジレシピ3品を紹介", "url": "https://ameblo.jp/harapankazoku/entry-12946705842.html", "gyosu_item": "パスタアラビアータ（惣菜）", "item_group": "冷凍惣菜・加工品", "dish": "アラビアータのグラタンほか3品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "blog", "title": "業務スーパーに売っているオススメ冷凍食品を試し買い！アレンジレシピも紹介します！", "url": "https://patte-de-lapin.hatenablog.jp/entry/2024/07/31/170000", "gyosu_item": "冷凍食品いろいろ", "item_group": "冷凍惣菜・加工品", "dish": "冷凍食品のアレンジ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "blog", "title": "【業務スーパー】鶏肉2kgでバズレシピ②", "url": "https://ameblo.jp/hitomitwo/entry-12588279266.html", "gyosu_item": "鶏肉2kg", "item_group": "肉", "dish": "鶏肉のバズレシピ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "web", "title": "アレンジ無限大!業務スーパーの冷凍魚介が超便利!", "url": "https://www.bepal.net/archives/683787", "gyosu_item": "冷凍魚介", "item_group": "魚介", "dish": "塩さばのホットサンドほか", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": false, "official": false, "date": ""}, {"source": "web", "title": "【業スー納得】 包丁いらずで即ごはん。マニアが「常にストックする」最強肉おかず3選", "url": "https://ichioshi.smt.docomo.ne.jp/articles/limited/35835", "gyosu_item": "冷凍の肉おかず", "item_group": "冷凍惣菜・加工品", "dish": "肉おかず3品", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}, {"source": "web", "title": "ビジネスジャーナル 業務スーパー餃子、絶品アレンジ術", "url": "https://biz-journal.jp/2023/07/post_356524.html", "gyosu_item": "冷凍餃子", "item_group": "冷凍惣菜・加工品", "dish": "餃子のアレンジ", "section": "まとめ", "kind": "set", "seasoning": null, "hitote": true, "official": false, "date": ""}];
+const TODAY = "2026-10-30";
+const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
+const SEAS_TAB = "調味料が主役";
+const GROUPS = ["肉", "魚介", "野菜", "豆腐・大豆・こんにゃく", "冷凍惣菜・加工品", "調味料", "麺・粉もの"];
+const SRC = { youtube: "YouTube", blog: "ブログ", web: "記事" };
+
+const ones = ITEMS.filter(x => x.kind === "one").sort((a, b) => b.date.localeCompare(a.date));
+const sets = ITEMS.filter(x => x.kind === "set");
+const daysAgo = d => Math.round((new Date(TODAY) - new Date(d)) / 864e5);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = d => { const [, m, day] = d.split("-"); return `${+m}月${+day}日`; };
+const srcLabel = x => (x.official ? "公式 " : "") + SRC[x.source];
+
+function tags(x, withSec = true) {
+  let h = "";
+  if (withSec) h += `<span class="tag sec">${esc(x.section)}</span>`;
+  h += `<span class="tag">${esc(x.item_group)}</span>`;
+  if (x.seasoning) h += `<span class="tag hit">${esc(x.seasoning)}</span>`;
+  if (x.hitote) h += `<span class="tag hit">ひと手間</span>`;
+  if (x.official) h += `<span class="tag off">公式</span>`;
+  return `<div class="tags">${h}</div>`;
+}
+
+// 今日の一品
+const t = ones[0];
+document.getElementById("today").innerHTML = `
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${esc(t.dish)}</span></a>
+  <div class="info">
+    <div class="date">${fmt(t.date)}の一品・${esc(t.gyosu_item)}</div>
+    <p class="dish">${esc(t.dish)}</p>
+    ${tags(t)}
+    <div class="orig">${esc(t.title)}</div>
+    <a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
+  </div>`;
+
+// 新着（10日以内）
+document.getElementById("wall").innerHTML = ones.filter(x => daysAgo(x.date) < 10).map(x => `
+  <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
+    <span class="stamp">新</span><span class="name">${esc(x.dish)}</span><span class="d">${fmt(x.date)}</span></a></li>`).join("");
+
+// 品書き
+let tab = SECTIONS[0], group = null, hitoteOnly = false;
+const inTab = (x, tb) => tb === SEAS_TAB ? !!x.seasoning : x.section === tb && x.kind === "one";
+const pool = tb => tb === SEAS_TAB ? ITEMS.filter(x => x.seasoning) : ones;
+
+function renderTabs() {
+  const all = [...SECTIONS, SEAS_TAB];
+  document.getElementById("tabs").innerHTML = all.map(tb => {
+    const n = pool(tb).filter(x => inTab(x, tb)).length;
+    return `<button class="tab${tb === SEAS_TAB ? " special" : ""}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}">${tb}<span class="n">${n}</span></button>`;
+  }).join("");
+}
+function renderFilters() {
+  if (tab === SEAS_TAB) { document.getElementById("filters").innerHTML = `<span class="lbl">業務スーパーの調味料ごとに並べています</span>`; return; }
+  const base = ones.filter(x => inTab(x, tab));
+  const gs = GROUPS.filter(g => base.some(x => x.item_group === g));
+  document.getElementById("filters").innerHTML = `<span class="lbl">仕入れ</span>` +
+    `<button class="chip" id="g-all" aria-pressed="${group === null}" data-g="">すべて</button>` +
+    gs.map((g, i) => `<button class="chip" id="g-${i}" aria-pressed="${group === g}" data-g="${g}">${g}</button>`).join("") +
+    `<button class="chip hitote" id="g-hitote" aria-pressed="${hitoteOnly}" data-h="1">ひと手間だけ</button>`;
+}
+const row = (x, withSec) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
+  <span class="dish">${esc(x.dish)}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
+  <div class="src">${srcLabel(x)}${x.date ? `<br>${fmt(x.date)}` : ""}</div></li>`;
+
+function renderMenu() {
+  const el = document.getElementById("menu");
+  if (tab === SEAS_TAB) {
+    const by = {};
+    ITEMS.filter(x => x.seasoning).forEach(x => (by[x.seasoning] ||= []).push(x));
+    el.innerHTML = Object.entries(by).sort((a, b) => b[1].length - a[1].length).map(([s, xs]) =>
+      `<div class="seas-head">${esc(s)}<small>${xs.length}件</small></div><ul class="list">${xs.map(x => row(x, true)).join("")}</ul>`).join("");
+    return;
+  }
+  const xs = ones.filter(x => inTab(x, tab) && (!group || x.item_group === group) && (!hitoteOnly || x.hitote));
+  el.innerHTML = xs.length ? `<ul class="list">${xs.map(x => row(x, false)).join("")}</ul>` : `<p class="empty">この組み合わせの品はまだありません。</p>`;
+}
+function render() { renderTabs(); renderFilters(); renderMenu(); }
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-tab]"); if (!b) return;
+  tab = b.dataset.tab; group = null; hitoteOnly = false; render();
+});
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.h) hitoteOnly = !hitoteOnly; else group = b.dataset.g || null;
+  renderFilters(); renderMenu();
+});
+render();
+
+// まとめて見る
+document.getElementById("sets").innerHTML = sets.map(x => row(x, false)).join("");
+</script>
