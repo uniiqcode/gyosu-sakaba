@@ -1816,5 +1816,41 @@
   "hitote": true,
   "official": false,
   "added": "2026-10-30"
+ },
+ {
+  "id": "9de8486bf6",
+  "url": "https://ameblo.jp/noripetit/entry-12983079736.html",
+  "title": "おかわりしたくなる‼︎【きのこ&ツナの炊き込みごはん】",
+  "source": "blog",
+  "channel": "",
+  "posted": "2026-10-31",
+  "found": "2026-10-31",
+  "dish": "おかわりしたくなる",
+  "section": "〆",
+  "item_group": "魚介",
+  "gyosu_item": "ツナ",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": false,
+  "added": "2026-10-31"
+ },
+ {
+  "id": "5e8ecdc13c",
+  "url": "https://www.youtube.com/watch?v=5yjD489N-iU",
+  "title": "料理がもっと楽しくなる！業務スーパーの神調味料6選",
+  "source": "youtube",
+  "channel": "生活色々発信アライグマ",
+  "posted": "2026-10-29",
+  "found": "2026-10-30",
+  "dish": "料理がもっと楽しくなる の神調味料6選",
+  "section": "未分類",
+  "item_group": "冷凍惣菜・加工品",
+  "gyosu_item": "餃子",
+  "seasoning": "姜葱醤",
+  "kind": "set",
+  "hitote": true,
+  "official": false,
+  "added": "2026-10-31"
  }
 ]
