@@ -25,10 +25,9 @@ def main():
     recipes = gyosu.load_json(gyosu.RECIPES)
     stock = gyosu.load_json(gyosu.STOCK)
     day = gyosu.today()
-    if any(r["added"] == day and r["kind"] == "one" for r in recipes):
-        print("今日の1品はもう載せてある")
-        return 0
-    chosen = [x for x in (pick(stock, "one"), pick(stock, "set")) if x]
+    # 今日の1品が載せてあっても、集めた結果（ストック・見た URL）を残すため PR の説明は作る
+    done = any(r["added"] == day and r["kind"] == "one" for r in recipes)
+    chosen = [] if done else [x for x in (pick(stock, "one"), pick(stock, "set")) if x]
     for x in chosen:
         stock.remove(x)
         recipes.append({**x, "added": day})
@@ -38,7 +37,10 @@ def main():
     collect = json.loads((gyosu.ROOT / "data/last_collect.json").read_text(encoding="utf-8")) \
         if (gyosu.ROOT / "data/last_collect.json").exists() else {}
     body = [f"{day} の更新です。内容を確かめてマージしてください。", "", "## 今日載せるもの"]
-    body += [line(x) for x in chosen] or ["- ストックが空なので、今日は載せるものがありません"]
+    if done:
+        body += ["- 今日の1品はもう載せてあるので、今日は集めた結果だけを記録します"]
+    else:
+        body += [line(x) for x in chosen] or ["- ストックが空なので、今日は載せるものがありません"]
     if any(x["section"] == gyosu.UNSORTED for x in chosen):
         body += ["", "⚠ 区分が「未分類」です。`data/recipes.json` の `section` を焼き物・揚げ物・煮物・炒め物・小鉢・〆 のどれかに直してください。"]
     body += ["", "料理名（`dish`）や区分が違っていたら、この PR の `data/recipes.json` を直してからマージしてください。"]
