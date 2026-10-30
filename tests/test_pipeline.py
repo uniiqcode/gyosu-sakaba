@@ -62,6 +62,27 @@ class Classify(unittest.TestCase):
         self.assertEqual(gyosu.clean_title("【業務スーパー】冷凍赤魚の煮付け‼️ - YouTube"), "冷凍赤魚の煮付け")
 
 
+class Pick(unittest.TestCase):
+    def test_newest_first_even_if_unsorted(self):
+        stock = [
+            {"kind": "one", "section": "焼き物", "posted": "2024-05-01", "found": "2026-10-30"},
+            {"kind": "one", "section": gyosu.UNSORTED, "posted": "2026-10-28", "found": "2026-10-30"},
+            {"kind": "one", "section": "煮物", "posted": "", "found": "2026-10-30"},
+        ]
+        self.assertEqual(publish.pick(stock, "one")["posted"], "2026-10-28")
+
+    def test_same_day_prefers_sorted(self):
+        stock = [
+            {"kind": "one", "section": gyosu.UNSORTED, "posted": "2026-10-28", "found": "2026-10-30"},
+            {"kind": "one", "section": "揚げ物", "posted": "2026-10-28", "found": "2026-10-30"},
+        ]
+        self.assertEqual(publish.pick(stock, "one")["section"], "揚げ物")
+
+    def test_old_only_is_still_picked(self):
+        stock = [{"kind": "one", "section": "焼き物", "posted": "2021-01-01", "found": "2026-10-30"}]
+        self.assertEqual(publish.pick(stock, "one")["posted"], "2021-01-01")
+
+
 class Pipeline(unittest.TestCase):
     """一時フォルダの上で、収集 → 掲載 を通す。"""
 
