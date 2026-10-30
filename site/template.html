@@ -1,10 +1,9 @@
 <title>業スー酒場</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
-/* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく */
+/* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく。スマホの縦向き専用（幅480pxまで） */
 :root {
   --bg: #EEEDE7;        /* 漆喰の壁 */
   --fg: #1E1F24;        /* 墨 */
@@ -33,9 +32,9 @@
   color-scheme: dark }
 
 * { box-sizing: border-box }
-body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.7 }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.7 }
 a { color: inherit }
-.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.wrap { max-width: 480px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 
 /* のれん */
 .noren { background: var(--ai); color: var(--ai-fg) }
@@ -46,8 +45,6 @@ a { color: inherit }
 .panels span:first-child { border-left: 0 }
 .sub { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; opacity: .92 }
 .sub b { font-weight: 500; font-size: 15px }
-
-.proto { font-size: 12px; color: var(--muted); padding-block: 10px 0 }
 
 section { padding-block: 28px 4px }
 h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4px; text-wrap: balance }
@@ -63,17 +60,15 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
   color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
 
 /* 今日の1品 */
-.today { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start }
-.today .tz { width: 118px; min-height: 400px; padding: 12px 0 16px; gap: 12px }
-.today .tz .name { font-size: 26px; max-height: 350px }
+.today { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start }
+.today .tz { width: 96px; min-height: 360px; padding: 12px 0 16px; gap: 12px }
+.today .tz .name { font-size: 22px; max-height: 320px }
 .today .info { display: grid; gap: 10px; min-width: 0 }
 .today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
-.today .dish { font-family: var(--brush); font-size: 28px; line-height: 1.3; margin: 0; text-wrap: balance }
+.today .dish { font-family: var(--brush); font-size: 24px; line-height: 1.3; margin: 0; text-wrap: balance }
 .orig { font-size: 13px; color: var(--muted); overflow-wrap: anywhere }
 .btn { justify-self: start; display: inline-flex; gap: 8px; align-items: center; background: var(--ai); color: var(--ai-fg);
   text-decoration: none; padding: 10px 18px; font-weight: 500; border-radius: 2px }
-@media (max-width: 520px) { .today { grid-template-columns: 1fr } .today .tz { width: 100%; min-height: 0; padding: 18px 12px }
-  .today .tz .name { writing-mode: horizontal-tb; font-size: 26px; max-height: none } }
 
 /* 札 */
 .tags { display: flex; flex-wrap: wrap; gap: 6px }
@@ -83,18 +78,19 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .tag.off { background: var(--fg); color: var(--bg); border-color: var(--fg) }
 
 /* 新着の壁 */
-.wall { overflow-x: auto; padding-bottom: 8px; direction: rtl }
+/* 画面幅に入るぶんだけ貼る（横スクロールなし）。右がいちばん新しい */
+.wall { overflow: hidden; direction: rtl }
 .wall li { direction: ltr }
-.wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; width: max-content }
-.wall .tz { width: 76px; height: 310px; padding: 10px 0 10px; gap: 8px; justify-content: space-between }
-.wall .tz .name { font-size: 17px; max-height: 240px; flex: 1 }
+.wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px }
+.wall .tz { width: 64px; height: 300px; padding: 10px 0 10px; gap: 8px; justify-content: space-between }
+.wall .tz .name { font-size: 16px; max-height: 230px; flex: 1 }
 .wall .tz .d { font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
 .wall .tz:hover { transform: translateY(-2px) }
 @media (prefers-reduced-motion: no-preference) { .wall .tz { transition: transform .15s } }
 
 /* 品書きのタブ */
 .tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 2px solid var(--fg) }
-.tab { font: inherit; font-family: var(--brush); font-size: 19px; background: none; border: 0; color: var(--fg); padding: 8px 14px 6px; cursor: pointer }
+.tab { font: inherit; font-family: var(--brush); font-size: 18px; background: none; border: 0; color: var(--fg); padding: 8px 10px 6px; cursor: pointer }
 .tab[aria-selected="true"] { background: var(--fg); color: var(--bg) }
 .tab .n { font-family: var(--body); font-size: 11px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
 .tab.special { color: var(--shu) }
@@ -129,8 +125,6 @@ footer p { margin: 0 0 6px }
 </header>
 
 <main class="wrap">
-  <p class="proto">試作の画面です。リンクは試しに集めた実際のページですが、公開日は並べ方を見るための仮の日付です。</p>
-
   <section aria-labelledby="h-today">
     <h2 id="h-today">今日の一品</h2>
     <div class="today" id="today"></div>
@@ -138,7 +132,7 @@ footer p { margin: 0 0 6px }
 
   <section aria-labelledby="h-new">
     <h2 id="h-new">新着</h2>
-    <p class="lead">この10日間に貼った短冊です。右がいちばん新しい品です。</p>
+    <p class="lead">毎日1品ずつ貼っていきます。右がいちばん新しい品です。</p>
     <div class="wall"><ol id="wall"></ol></div>
   </section>
 
@@ -164,15 +158,15 @@ footer p { margin: 0 0 6px }
 
 <script>
 const ITEMS = __DATA__;
-const TODAY = "2026-10-30";
 const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
 const SEAS_TAB = "調味料が主役";
 const GROUPS = ["肉", "魚介", "野菜", "豆腐・大豆・こんにゃく", "冷凍惣菜・加工品", "調味料", "麺・粉もの"];
 const SRC = { youtube: "YouTube", blog: "ブログ", web: "記事" };
 
-const ones = ITEMS.filter(x => x.kind === "one").sort((a, b) => b.date.localeCompare(a.date));
-const sets = ITEMS.filter(x => x.kind === "set");
-const daysAgo = d => Math.round((new Date(TODAY) - new Date(d)) / 864e5);
+// ITEMS は載せた順（後ろほど新しい）。新しい順に並べ直して使う
+const newest = [...ITEMS].reverse();
+const ones = newest.filter(x => x.kind === "one");
+const sets = newest.filter(x => x.kind === "set");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = d => { const [, m, day] = d.split("-"); return `${+m}月${+day}日`; };
 const srcLabel = x => (x.official ? "公式 " : "") + SRC[x.source];
@@ -192,22 +186,25 @@ const t = ones[0];
 document.getElementById("today").innerHTML = `
   <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${esc(t.dish)}</span></a>
   <div class="info">
-    <div class="date">${fmt(t.date)}の一品・${esc(t.gyosu_item)}</div>
+    <div class="date">${fmt(t.added)}の一品・${esc(t.gyosu_item)}</div>
     <p class="dish">${esc(t.dish)}</p>
     ${tags(t)}
     <div class="orig">${esc(t.title)}</div>
     <a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
   </div>`;
 
-// 新着（10日以内）
-document.getElementById("wall").innerHTML = ones.filter(x => daysAgo(x.date) < 10).map(x => `
+// 新着（画面幅に入るぶんだけ）
+const STRIP = 64, GAP = 8;
+const wallEl = document.getElementById("wall");
+const fit = Math.max(1, Math.floor((wallEl.parentElement.clientWidth + GAP) / (STRIP + GAP)));
+wallEl.innerHTML = ones.slice(0, fit).map(x => `
   <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
-    <span class="stamp">新</span><span class="name">${esc(x.dish)}</span><span class="d">${fmt(x.date)}</span></a></li>`).join("");
+    <span class="stamp">新</span><span class="name">${esc(x.dish)}</span><span class="d">${fmt(x.added)}</span></a></li>`).join("");
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
 const inTab = (x, tb) => tb === SEAS_TAB ? !!x.seasoning : x.section === tb && x.kind === "one";
-const pool = tb => tb === SEAS_TAB ? ITEMS.filter(x => x.seasoning) : ones;
+const pool = tb => tb === SEAS_TAB ? newest.filter(x => x.seasoning) : ones;
 
 function renderTabs() {
   const all = [...SECTIONS, SEAS_TAB];
@@ -227,13 +224,13 @@ function renderFilters() {
 }
 const row = (x, withSec) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
   <span class="dish">${esc(x.dish)}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
-  <div class="src">${srcLabel(x)}${x.date ? `<br>${fmt(x.date)}` : ""}</div></li>`;
+  <div class="src">${srcLabel(x)}${x.kind === "one" ? `<br>${fmt(x.added)}` : ""}</div></li>`;
 
 function renderMenu() {
   const el = document.getElementById("menu");
   if (tab === SEAS_TAB) {
     const by = {};
-    ITEMS.filter(x => x.seasoning).forEach(x => (by[x.seasoning] ||= []).push(x));
+    newest.filter(x => x.seasoning).forEach(x => (by[x.seasoning] ||= []).push(x));
     el.innerHTML = Object.entries(by).sort((a, b) => b[1].length - a[1].length).map(([s, xs]) =>
       `<div class="seas-head">${esc(s)}<small>${xs.length}件</small></div><ul class="list">${xs.map(x => row(x, true)).join("")}</ul>`).join("");
     return;

@@ -1,0 +1,58 @@
+# 毎朝、新しい動画・記事を集めて、今日の1品を選び、PR を作る。
+# 人は PR を確かめてマージするだけ。マージするとページが更新される（pages.yml）。
+name: 毎日の更新
+
+on:
+  schedule:
+    - cron: "10 20 * * *"   # 毎日 5:10（日本時間）
+  workflow_dispatch:         # Actions の画面から手で動かすこともできる
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: テスト
+        run: python3 -m unittest discover -s tests
+
+      - name: 集める
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python3 scripts/collect.py
+
+      - name: 今日の1品を選ぶ
+        run: python3 scripts/publish.py
+
+      - name: ページが作れるか確かめる
+        run: python3 scripts/build_site.py
+
+      - name: 日付
+        id: day
+        run: echo "day=$(TZ=Asia/Tokyo date +%F)" >> "$GITHUB_OUTPUT"
+
+      # 前の日の PR がマージされずに残っていたら、その PR を今日の内容で置き換える
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: daily-update
+          delete-branch: true
+          title: "毎日の更新 ${{ steps.day.outputs.day }}"
+          body-path: pr_body.md
+          commit-message: "毎日の更新 ${{ steps.day.outputs.day }}"
+          add-paths: |
+            data/recipes.json
+            data/stock.json
+            data/seen.tsv
+            data/last_collect.json
