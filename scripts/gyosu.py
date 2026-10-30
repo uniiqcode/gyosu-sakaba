@@ -80,6 +80,10 @@ def _first(rules, text):
 def clean_title(title):
     """タイトルから料理名の候補を作る。人が PR で直す前提の下書き。"""
     t = re.sub(r"\s*[-|｜]\s*YouTube\s*$", "", title)
+    # 「料理名｜業務スーパーミラクルレシピ」のような、｜の後ろのチャンネル名・シリーズ名を落とす
+    parts = [s for s in re.split(r"[|｜]", t) if s.strip()]
+    if len(parts) > 1:
+        t = max(parts[:-1], key=len) if re.search(r"業務用?スーパー|業スー", parts[-1]) else t
     t = re.sub(r"[【\[［〔(（][^】\]］〕)）]*[】\]］〕)）]", " ", t)
     t = re.sub(r"#\S+", " ", t)
     t = re.sub(r"業務用?スーパー|業スー|の?(簡単|激うま|絶品|最強|節約)?レシピ", " ", t)
@@ -87,6 +91,33 @@ def clean_title(title):
     t = re.sub(r"\s+", " ", t).strip(" ・")
     t = re.sub(r"^(の|で|を|は)\s*", "", t)   # 「業スーの〇〇」の「の」など
     return t[:30] or title[:30]
+
+
+def title_reject(title, rules):
+    """タイトルだけで載せないと決められるなら、その理由を返す。"""
+    if any(w in title for w in rules["reject"]["other_stores"]) and not any(w in title for w in rules["accept"]["gyosu"]):
+        return "ほかの店の記事"
+    bad = [w for w in rules["reject"]["title"] if w in title]
+    if bad:
+        return f"除外の言葉（{bad[0]}）"
+    if any(w in title for w in rules["reject"]["review"]) and _first(rules["section"], title)[0] is None:
+        return "商品の感想"
+    return None
+
+
+def recheck(item, rules):
+    """ストックの1件を今のルールで見直す。外すなら理由の文字列、残すなら直した item を返す。
+    ストックには説明文を残していない（元のページの文章を写さないため）ので、タイトルだけで見る。"""
+    title = item["title"]
+    reason = title_reject(title, rules)
+    if reason:
+        return reason
+    section, _ = _first(rules["section"], title)
+    if section is None and not any(w in title for w in rules["accept"]["gyosu"]):
+        return "タイトルに業務スーパーも料理の言葉もない"
+    if item["section"] == UNSORTED and section:
+        item = {**item, "section": section}
+    return {**item, "dish": clean_title(title)} if "dish" in item else item
 
 
 def classify(title, description="", url="", channel="", rules=None):
@@ -98,11 +129,14 @@ def classify(title, description="", url="", channel="", rules=None):
         return "対象外のサイト"
     if not any(w in text for w in rules["accept"]["gyosu"]):
         return "業務スーパーの言葉がない"
-    bad = [w for w in rules["reject"]["title"] if w in title]
-    if bad:
-        return f"除外の言葉（{bad[0]}）"
+    reason = title_reject(title, rules)
+    if reason:
+        return reason
     # 区分と札は、まずタイトルで決め、だめなら説明文も見る
     section, _ = _first(rules["section"], title)
+    # 業務スーパーの言葉が説明文にしかないなら、タイトルに料理の言葉があることを条件にする
+    if section is None and not any(w in title for w in rules["accept"]["gyosu"]):
+        return "タイトルに業務スーパーも料理の言葉もない"
     kind = "set" if any(re.search(p, title) for p in rules["set"]["patterns"]) else "one"
     # 料理の言葉（煮・炒め・唐揚げなど）や「〇品」「作り置き」がタイトルにあれば、それもレシピの目印にする
     if section is None and kind == "one" and not any(w in text for w in rules["accept"]["recipe"]):

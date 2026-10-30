@@ -94,9 +94,17 @@ def main():
 
     seen = gyosu.load_seen()
     seen |= {gyosu.normalize_url(x["url"]) for x in gyosu.load_json(gyosu.RECIPES) + gyosu.load_json(gyosu.STOCK)}
-    stock = gyosu.load_json(gyosu.STOCK)
     day = gyosu.today()
     log, added = [], []
+    # ルールを変えた時のために、ストックも今のルールで見直す
+    stock = []
+    for x in gyosu.load_json(gyosu.STOCK):
+        r = gyosu.recheck(x, rules)
+        if isinstance(r, str):
+            log.append((day, x["url"], f"ストックから外した: {r}"))
+        else:
+            stock.append(r)
+    removed = len(log)
     for x in found:
         url = gyosu.normalize_url(x["url"])
         if url in seen:
@@ -114,7 +122,7 @@ def main():
     gyosu.save_json(gyosu.STOCK, stock)
     gyosu.append_seen(log)
 
-    summary = {"found": len(found), "new": len(log), "stocked": len(added), "errors": errors}
+    summary = {"found": len(found), "new": len(log) - removed, "stocked": len(added), "removed": removed, "errors": errors}
     (gyosu.ROOT / "data/last_collect.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=1))
     return 0
