@@ -1,4 +1,9 @@
 <title>業スー酒場</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
@@ -38,12 +43,11 @@ a { color: inherit }
 
 /* のれん */
 .noren { background: var(--ai); color: var(--ai-fg) }
-.noren .wrap { padding-block: 0 18px; display: grid; gap: 10px }
-.panels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 420px }
-.panels span { font-family: var(--brush); font-size: clamp(30px, 8vw, 46px); line-height: 1; text-align: center;
-  padding: 22px 0 18px; border-left: 1px solid color-mix(in srgb, var(--ai-fg) 18%, transparent) }
-.panels span:first-child { border-left: 0 }
-.sub { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; opacity: .92 }
+.noren .wrap { padding-block: 16px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center }
+/* ロゴは白地に緑の文字。のれんの上に白い札として置く */
+.logo { display: block; width: 92px; height: 92px; background: #FFFFFF; padding: 8px; border-radius: 4px }
+.logo img { display: block; width: 100%; height: 100%; object-fit: contain }
+.sub { display: grid; gap: 4px; font-size: 13px; opacity: .92; min-width: 0 }
 .sub b { font-weight: 500; font-size: 15px }
 
 section { padding-block: 28px 4px }
@@ -119,7 +123,7 @@ footer p { margin: 0 0 6px }
 
 <header class="noren">
   <div class="wrap">
-    <div class="panels" aria-label="業スー酒場"><span>業</span><span>ス</span><span>ー</span><span>酒</span><span>場</span></div>
+    <h1 class="logo"><img src="logo-mark.png" alt="業スー酒場" width="800" height="785"></h1>
     <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理のレシピへのリンク集（非公式）</span></div>
   </div>
 </header>
