@@ -1,0 +1,37 @@
+# 毎日の自動収集で見に行くところ。人が足したり消したりしてよい。
+
+[youtube]
+# YouTube Data API の検索語。1回の検索で無料枠（1日10,000）のうち100を使う。
+# 検索語 × 2（新しい順・関連順）回の検索をする。8語なら1,600。
+queries = [
+  "業務スーパー レシピ おつまみ",
+  "業務スーパー アレンジ レシピ",
+  "業務スーパー 冷凍 アレンジ",
+  "業務スーパー 鶏肉 レシピ",
+  "業務スーパー 魚 レシピ",
+  "業務スーパー 居酒屋",
+  "業務スーパー 調味料 レシピ",
+  "業務スーパーミラクルレシピ",
+]
+# 何日前までの動画を探すか（見逃しを拾うため長めにする）
+days = 60
+max_results = 25
+
+[rss]
+# RSS / Atom のフィード。業務スーパー以外の記事も混ざるが、rules.toml で絞る。
+# 試しに集めた時に業務スーパーのレシピを書いていたブログ。
+feeds = [
+  "https://patte-de-lapin.hatenablog.jp/rss",
+  "https://ql.hatenablog.com/rss",
+  "https://i-take-cooking.hateblo.jp/rss",
+  "https://ot-icecream.hatenablog.com/rss",
+  "https://rssblog.ameba.jp/mayutearoom/rss20.xml",
+  "https://rssblog.ameba.jp/makorin-to-penko/rss20.xml",
+  "https://rssblog.ameba.jp/noripetit/rss20.xml",
+  "https://rssblog.ameba.jp/baronmamadesu/rss20.xml",
+  "https://note.com/grand_arnica8909/rss",
+  "https://note.com/yoko_emi/rss",
+  "https://note.com/teki_kaku/rss",
+  # はてなブックマークの検索（新着順）。新しいブログを見つける入口
+  "https://b.hatena.ne.jp/q/%E6%A5%AD%E5%8B%99%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%20%E3%83%AC%E3%82%B7%E3%83%94?mode=rss&sort=recent",
+]
