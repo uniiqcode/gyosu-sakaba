@@ -72,5 +72,6 @@ PR の説明に、今日載せるもの（料理名・区分・札・元のタ�
 | YouTube の検索語、RSS のフィード | `config/sources.toml` |
 | 動く時刻 | `.github/workflows/daily.yml` の `cron`（UTC で書く。日本時間 −9時間） |
 | ページの見た目 | `site/template.html` |
+| ロゴ・アイコン | `site/assets/`（作り直し方は `design/README.md`） |
 
 ルールを変えたら `python3 -m unittest discover -s tests` で確かめる（GitHub Actions でも毎朝確かめている）。

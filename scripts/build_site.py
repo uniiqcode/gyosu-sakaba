@@ -3,6 +3,7 @@
 使い方: python3 scripts/build_site.py
 """
 import json
+import shutil
 import sys
 
 import gyosu
@@ -22,6 +23,10 @@ def main():
     out = gyosu.ROOT / "_site"
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(html, encoding="utf-8")
+    # ロゴ・アイコン・ホーム画面用の設定を、ページと同じ場所に置く
+    for f in (gyosu.ROOT / "site/assets").iterdir():
+        shutil.copy(f, out / f.name)
+    shutil.copy(gyosu.ROOT / "site/manifest.webmanifest", out / "manifest.webmanifest")
     print(f"_site/index.html を作った（{len(items)}件）")
     return 0
 
