@@ -100,9 +100,11 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(recipes[0]["added"], "2026-10-30")
         self.assertIn("姜葱醤で鶏むねの甘辛炒め", (gyosu.ROOT / "pr_body.md").read_text(encoding="utf-8"))
 
-        # 同じ日に2回動いても、2品目は載せない
+        # 同じ日に2回動いても、2品目は載せない。PR の説明は作る
+        (gyosu.ROOT / "pr_body.md").unlink()
         publish.main()
         self.assertEqual(len(gyosu.load_json(gyosu.RECIPES)), 1)
+        self.assertIn("もう載せてある", (gyosu.ROOT / "pr_body.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
