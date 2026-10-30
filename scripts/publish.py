@@ -50,7 +50,8 @@ def main():
     body += ["", "料理名（`dish`）や区分が違っていたら、この PR の `data/recipes.json` を直してからマージしてください。"]
     body += ["", "## 集めた結果",
              f"- 見つけた: {collect.get('found', '-')}件 / 初めて見た: {collect.get('new', '-')}件 / ストックに入れた: {collect.get('stocked', '-')}件",
-             f"- ストックの残り: 1品 {sum(x['kind'] == 'one' for x in stock)}件・まとめ {sum(x['kind'] == 'set' for x in stock)}件"]
+             f"- 今のルールでストックから外した: {collect.get('removed', 0)}件",
+             f"- ストックの残り: 1品 {sum(x['kind'] == 'one' for x in stock)}件（未分類 {sum(x['kind'] == 'one' and x['section'] == gyosu.UNSORTED for x in stock)}件）・まとめ {sum(x['kind'] == 'set' for x in stock)}件"]
     if collect.get("errors"):
         body += ["", "## うまく取れなかったところ"] + [f"- {e}" for e in collect["errors"]]
     (gyosu.ROOT / "pr_body.md").write_text("\n".join(body) + "\n", encoding="utf-8")

@@ -51,6 +51,17 @@ class Classify(unittest.TestCase):
         self.assertTrue(gyosu.classify("白身魚の中華甘酢あんかけ｜業務スーパーミラクルレシピ", "")["official"])
         self.assertFalse(gyosu.classify("業務スーパーの豚の角煮", "", channel="業務スーパーマニア")["official"])
 
+    def test_other_store(self):
+        self.assertEqual(gyosu.classify("【コストコ】本日の値下げ", "業務スーパーも好き 作り方"), "ほかの店の記事")
+        self.assertIsInstance(gyosu.classify("業務スーパーとコストコの鶏むねで唐揚げ", ""), dict)
+
+    def test_recheck_stock(self):
+        rules = gyosu.load_toml("rules.toml")
+        old = {"title": "【コストコ】新商品続々！", "section": gyosu.UNSORTED}
+        self.assertEqual(gyosu.recheck(old, rules), "ほかの店の記事")
+        x = {"title": "業務スーパーの明太子で明太子グラタン", "section": gyosu.UNSORTED}
+        self.assertEqual(gyosu.recheck(x, rules)["section"], "焼き物")
+
     def test_normalize_url(self):
         n = gyosu.normalize_url
         self.assertEqual(n("https://www.youtube.com/shorts/abc"), "https://www.youtube.com/watch?v=abc")
@@ -60,6 +71,16 @@ class Classify(unittest.TestCase):
 
     def test_clean_title(self):
         self.assertEqual(gyosu.clean_title("【業務スーパー】冷凍赤魚の煮付け‼️ - YouTube"), "冷凍赤魚の煮付け")
+        self.assertEqual(gyosu.clean_title("【3ステップ】旨辛！もちもちビビン麺｜業務スーパーミラクルレシピ"), "旨辛 もちもちビビン麺")
+        self.assertEqual(gyosu.clean_title("鶏皮ぎょうざ｜業務スーパー"), "鶏皮ぎょうざ")
+
+    def test_review(self):
+        self.assertEqual(gyosu.classify("【業務スーパー】しめじの値段が198円 実際に使ってみた感想", "レシピ"), "商品の感想")
+        self.assertIsInstance(gyosu.classify("【業務スーパー】冷凍赤魚の値段が558円 赤魚の煮付け", ""), dict)
+
+    def test_title_needs_gyosu_or_dish(self):
+        self.assertEqual(gyosu.classify("海外一人旅 最初に降り立つ国は", "業務スーパー 簡単"), "タイトルに業務スーパーも料理の言葉もない")
+        self.assertIsInstance(gyosu.classify("溶ける黄金カルボナーラ【レシピあり】", "業務スーパーの食材で"), dict)
 
 
 class Pick(unittest.TestCase):
