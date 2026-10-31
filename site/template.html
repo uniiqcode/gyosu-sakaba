@@ -61,7 +61,7 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .tz { background: var(--paper); color: var(--ink); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); position: relative; text-decoration: none;
   display: flex; flex-direction: column; align-items: center }
-.tz .name { writing-mode: vertical-rl; font-family: var(--brush); color: var(--ink); line-height: 1.25; letter-spacing: .04em }
+.tz .name { writing-mode: vertical-rl; text-orientation: upright; font-family: var(--brush); color: var(--ink); line-height: 1.25; letter-spacing: .04em }
 .tz:focus-visible, .chip:focus-visible, .tab:focus-visible, .row a:focus-visible, .btn:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
 .stamp { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shu);
   color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
@@ -178,6 +178,26 @@ const ones = newest.filter(x => x.kind === "one");
 const sets = newest.filter(x => x.kind === "set");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = d => { const [, m, day] = d.split("-"); return `${+m}月${+day}日`; };
+// 料理名に「／」があれば、短冊ではそこで2行に分ける（PR で人が入れる）。ほかの場所では「／」を消して出す
+const plain = s => String(s).replace(/／/g, "");
+// 短冊（縦書き）用。半角の英数字・記号は縦にすると寝てしまうので全角にする
+const zen = s => String(s).replace(/[!-~]/g, c => String.fromCharCode(c.charCodeAt(0) + 0xFEE0)).replace(/ /g, "");
+// 長い料理名は、文節の切れ目のうち2行の長さがいちばんそろう所で分ける
+const BREAK_AFTER = "のとでにを風＆×・、";
+function strip(s, max = 8) {
+  const z = zen(s);
+  let parts = z.includes("／") ? z.split("／", 2) : [z];
+  if (parts.length === 1 && z.length > max) {
+    let best = -1, score = Infinity;
+    for (let i = 2; i <= z.length - 2; i++) {
+      if (!BREAK_AFTER.includes(z[i - 1]) && !z.startsWith("ほか", i)) continue;
+      const sc = Math.max(i, z.length - i);
+      if (sc < score) { score = sc; best = i; }
+    }
+    if (best > 0) parts = [z.slice(0, best), z.slice(best)];
+  }
+  return parts.map(p => esc(p.replace(/[・、]$/, ""))).join("<br>");
+}
 const srcLabel = x => (x.official ? "公式 " : "") + SRC[x.source];
 
 function tags(x, withSec = true) {
@@ -193,10 +213,10 @@ function tags(x, withSec = true) {
 // 今日の一品
 const t = ones[0];
 document.getElementById("today").innerHTML = `
-  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${esc(t.dish)}</span></a>
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${strip(t.dish)}</span></a>
   <div class="info">
     <div class="date">${fmt(t.added)}の一品・${esc(t.gyosu_item)}</div>
-    <p class="dish">${esc(t.dish)}</p>
+    <p class="dish">${esc(plain(t.dish))}</p>
     ${tags(t)}
     <div class="orig">${esc(t.title)}</div>
     <a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
@@ -208,7 +228,7 @@ const wallEl = document.getElementById("wall");
 const fit = Math.max(1, Math.floor((wallEl.parentElement.clientWidth + GAP) / (STRIP + GAP)));
 wallEl.innerHTML = ones.slice(0, fit).map(x => `
   <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
-    <span class="stamp">新</span><span class="name">${esc(x.dish)}</span><span class="d">${fmt(x.added)}</span></a></li>`).join("");
+    <span class="stamp">新</span><span class="name">${strip(x.dish)}</span><span class="d">${fmt(x.added)}</span></a></li>`).join("");
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
@@ -232,7 +252,7 @@ function renderFilters() {
     `<button class="chip hitote" id="g-hitote" aria-pressed="${hitoteOnly}" data-h="1">ひと手間だけ</button>`;
 }
 const row = (x, withSec) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
-  <span class="dish">${esc(x.dish)}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
+  <span class="dish">${esc(plain(x.dish))}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
   <div class="src">${srcLabel(x)}${x.kind === "one" ? `<br>${fmt(x.added)}` : ""}</div></li>`;
 
 function renderMenu() {
