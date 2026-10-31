@@ -5,6 +5,7 @@
 | `chochin-reference.png` | 提灯に書く文字の見本（縦書き）。ロゴの文字を並べ、「スー」を小さく、「ー」を縦棒にした。ChatGPT に添付する |
 | `chochin-prompt.md` | 提灯の絵を ChatGPT に頼むプロンプト |
 | `chochin-chatgpt-original.png` | ChatGPT が作った提灯の絵（2026-10-31）。採用。「スー」は縦中横（横並び）、背景は黒（夜に灯っている表現） |
+| `alley-prompt.md` | 夜の路地の絵（ページ上部の背景）を ChatGPT に頼むプロンプト |
 | `logo-chatgpt-original.webp` | ChatGPT が作ったロゴの元の画像（2026-10-30）。文字以外の緑（円・マスの線）があったので、Claude が消して `site/assets/logo-mark.png` にした |
 
 ## ロゴの決まり
