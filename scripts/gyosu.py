@@ -77,14 +77,22 @@ def _first(rules, text):
     return None, None
 
 
-def clean_title(title):
+BRACKET = r"[【\[［〔(（]([^】\]］〕)）]*)[】\]］〕)）]"
+
+
+def clean_title(title, rules=None):
     """タイトルから料理名の候補を作る。人が PR で直す前提の下書き。"""
     t = re.sub(r"\s*[-|｜]\s*YouTube\s*$", "", title)
     # 「料理名｜業務スーパーミラクルレシピ」のような、｜の後ろのチャンネル名・シリーズ名を落とす
     parts = [s for s in re.split(r"[|｜]", t) if s.strip()]
     if len(parts) > 1:
         t = max(parts[:-1], key=len) if re.search(r"業務用?スーパー|業スー", parts[-1]) else t
-    t = re.sub(r"[【\[［〔(（][^】\]］〕)）]*[】\]］〕)）]", " ", t)
+    # 【】の中はふつう「業務スーパー」「3ステップ」などの飾りなので消す。
+    # ただし料理名が【】の中にだけある（外に料理の言葉がない）ときは、【】の中を使う
+    sections = (rules or load_toml("rules.toml"))["section"]
+    outside = re.sub(BRACKET, " ", t)
+    inside = [s for s in re.findall(BRACKET, t) if _first(sections, s)[0]]
+    t = inside[0] if inside and not _first(sections, outside)[0] else outside
     t = re.sub(r"#\S+", " ", t)
     t = re.sub(r"業務用?スーパー|業スー|の?(簡単|激うま|絶品|最強|節約)?レシピ", " ", t)
     t = re.sub(r"[^\w\sぁ-んァ-ヶー一-龠々〆・&＆]", " ", t)  # 絵文字や記号を消す
@@ -117,7 +125,7 @@ def recheck(item, rules):
         return "タイトルに業務スーパーも料理の言葉もない"
     if item["section"] == UNSORTED and section:
         item = {**item, "section": section}
-    return {**item, "dish": clean_title(title)} if "dish" in item else item
+    return {**item, "dish": clean_title(title, rules)} if "dish" in item else item
 
 
 def classify(title, description="", url="", channel="", rules=None):
@@ -154,7 +162,7 @@ def classify(title, description="", url="", channel="", rules=None):
                 or any(title.endswith(w) for w in off["title_endswith"])
                 or channel in off["channels"])
     return {
-        "dish": clean_title(title),
+        "dish": clean_title(title, rules),
         "section": section or UNSORTED,
         "item_group": group or "いろいろ",
         "gyosu_item": item or "",
