@@ -29,3 +29,5 @@
 ## 短冊のフォント
 
 `strip-font-samples.png` は、短冊のフォント候補を縦書きで並べた見本（2026-10-31）。どれも Google Fonts で無料で使える。Darumadrop One は縦書きで文字が重なるので使えない。
+
+**Yusei Magic に決定**（2026-10-31）。短冊（今日の一品・新着の縦書きの札）の料理名だけに使う。文字の大きさは `site/template.html` の `stripName()` で短冊ごとに決める（2行は幅いっぱい、1行は大きめ）。ドラフトは `strip-draft-yusei-magic.png`。
