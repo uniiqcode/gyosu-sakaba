@@ -89,9 +89,10 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .wall { overflow: hidden; direction: rtl }
 .wall li { direction: ltr }
 .wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px }
-.wall .tz { width: 64px; height: 300px; padding: 10px 0 10px; gap: 8px; justify-content: space-between }
-.wall .tz .name { font-size: 16px; max-height: 230px; flex: 1 }
-.wall .tz .d { font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
+.wall .tz { width: 64px; height: 300px; padding: 10px 0 10px; gap: 8px; justify-content: flex-start }
+/* 料理名は伸ばさずに上に詰める（伸ばすと iPhone の Safari・Chrome で縦書きが下に寄るため）。日付は一番下へ */
+.wall .tz .name { font-size: 16px; max-height: 230px; flex: none }
+.wall .tz .d { margin-top: auto; font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
 .wall .tz:hover { transform: translateY(-2px) }
 @media (prefers-reduced-motion: no-preference) { .wall .tz { transition: transform .15s } }
 

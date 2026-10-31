@@ -25,3 +25,7 @@
 | `icon-maskable-512.png` | Android の丸・角丸の切り抜き用。文字を直径80%の円に収めるため小さめ |
 | `apple-touch-icon.png` | iPhone のホーム画面 |
 | `favicon.ico` | ブラウザのタブ |
+
+## 短冊のフォント
+
+`strip-font-samples.png` は、短冊のフォント候補を縦書きで並べた見本（2026-10-31）。どれも Google Fonts で無料で使える。Darumadrop One は縦書きで文字が重なるので使えない。
