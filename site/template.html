@@ -16,7 +16,8 @@
   --line: #D6D4CB;
   --ai: #1F3A5F;        /* 藍ののれん */
   --ai-fg: #F4F2EC;
-  --shu: #B8402B;       /* 朱の「新」 */
+  --shu: #B8402B;       /* 朱（強調） */
+  --red-marker: #D3261C; /* 短冊の「新」の二重丸（赤い油性マジック）。短冊の紙は暗い表示でも白いので、色は変えない */
   --paper: #FBFAF5;     /* 短冊の紙 */
   --ink: #1E1F24;
   --chip: #E3E1D8;
@@ -65,12 +66,15 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 /* 文字の大きさは短冊ごとに JavaScript で決める（stripName）。2行は幅いっぱい、1行は大きめ */
 .tz .name { writing-mode: vertical-rl; text-orientation: upright; font-family: var(--marker); color: var(--ink); line-height: 1.08; letter-spacing: 0; white-space: nowrap }
 .tz:focus-visible, .chip:focus-visible, .tab:focus-visible, .row a:focus-visible, .btn:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
-.stamp { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shu);
-  color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
+/* 新着の印の二重丸（文字なし）。赤い油性マジックで手書きしたように、短冊ごとに傾きと丸のゆがみを変える（newMark）。
+   料理名の1文字目の上の方に少し重ねる */
+.mark { position: absolute; top: 2px; left: 50%; z-index: 1; pointer-events: none; color: var(--red-marker) }
+.mark svg { display: block; width: 100%; height: 100%; overflow: visible }
 
 /* 今日の1品 */
 .today { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start }
-.today .tz { width: 96px; min-height: 360px; padding: 12px 0 16px; gap: 12px }
+.today .tz { width: 96px; min-height: 360px; padding: 47px 0 16px; gap: 12px }
+.today .mark { width: 54px; height: 54px; margin-left: -27px }
 .today .tz .name { max-height: 320px }
 .today .info { display: grid; gap: 10px; min-width: 0 }
 .today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
@@ -91,7 +95,8 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .wall { overflow: hidden; direction: rtl }
 .wall li { direction: ltr }
 .wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px }
-.wall .tz { width: 64px; height: 300px; padding: 10px 0 10px; gap: 8px; justify-content: flex-start }
+.wall .tz { width: 64px; height: 300px; padding: 37px 0 10px; gap: 8px; justify-content: flex-start }
+.wall .mark { width: 42px; height: 42px; margin-left: -21px }
 /* 料理名は伸ばさずに上に詰める（伸ばすと iPhone の Safari・Chrome で縦書きが下に寄るため）。日付は一番下へ */
 .wall .tz .name { max-height: 230px; flex: none }
 .wall .tz .d { margin-top: auto; font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
@@ -201,6 +206,27 @@ function splitDish(s, max = 8) {
   }
   return parts.map(p => p.replace(/[・、]$/, ""));
 }
+// 新着の印の二重丸（文字は入れない）。同じ短冊ではいつも同じ形になるよう、id から乱数の種を作る
+function newMark(id) {
+  let seed = [...String(id)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const rnd = () => (seed = (seed * 1103515245 + 12345) >>> 0) / 4294967296;
+  // 一筆書きの丸: 始まりと終わりが少し重なり、半径がゆるやかに揺れる
+  const ring = (r, wob) => {
+    const start = rnd() * 6.28, sweep = 6.28 + 0.35 + rnd() * 0.4, phase = rnd() * 6.28, k = 2 + Math.floor(rnd() * 2);
+    const pts = [];
+    for (let i = 0; i <= 64; i++) {
+      const a = start + sweep * i / 64;
+      const rr = r * (1 + wob * Math.sin(k * a + phase)) * (1 - 0.06 * i / 64);   // 書き終わりは少し内側へ
+      pts.push(`${(50 + rr * Math.cos(a) * 1.04).toFixed(1)},${(50 + rr * Math.sin(a)).toFixed(1)}`);
+    }
+    return pts.join(" ");
+  };
+  const tilt = -(6 + rnd() * 12);   // 少し左に傾ける（-6〜-18度）
+  return `<span class="mark" aria-label="新着" style="transform:rotate(${tilt.toFixed(1)}deg)"><svg viewBox="0 0 100 100" aria-hidden="true">
+    <polyline points="${ring(43, 0.05)}" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="${ring(25.6, 0.06)}" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></span>`;
+}
 // 短冊の料理名。w・h は文字を書ける幅と高さ（px）。手書きの品書きらしく、
 // 2行は2行で幅いっぱいに、1行は2行の時より大きく（幅の8割）書く。縦に入りきらなければ小さくする
 function stripName(s, w, h) {
@@ -225,7 +251,7 @@ function tags(x, withSec = true) {
 // 今日の一品
 const t = ones[0];
 document.getElementById("today").innerHTML = `
-  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span>${stripName(t.dish, 88, 320)}</a>
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener">${newMark(t.id)}${stripName(t.dish, 88, 320)}</a>
   <div class="info">
     <div class="date">${fmt(t.added)}の一品・${esc(t.gyosu_item)}</div>
     <p class="dish">${esc(plain(t.dish))}</p>
@@ -240,7 +266,7 @@ const wallEl = document.getElementById("wall");
 const fit = Math.max(1, Math.floor((wallEl.parentElement.clientWidth + GAP) / (STRIP + GAP)));
 wallEl.innerHTML = ones.slice(0, fit).map(x => `
   <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
-    <span class="stamp">新</span>${stripName(x.dish, 60, 230)}<span class="d">${fmt(x.added)}</span></a></li>`).join("");
+    ${newMark(x.id)}${stripName(x.dish, 60, 230)}<span class="d">${fmt(x.added)}</span></a></li>`).join("");
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
