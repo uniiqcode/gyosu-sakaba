@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0B0F1A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Yusei+Magic&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
 /* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく。スマホの縦向き専用（幅480pxまで） */
 :root {
@@ -23,6 +23,7 @@
   --chip-on: #1F3A5F;
   --chip-on-fg: #F4F2EC;
   --brush: "Yuji Syuku", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --marker: "Yusei Magic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;   /* 短冊の品書き（太いマジックの手書き） */
   --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
@@ -61,7 +62,8 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .tz { background: var(--paper); color: var(--ink); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); position: relative; text-decoration: none;
   display: flex; flex-direction: column; align-items: center }
-.tz .name { writing-mode: vertical-rl; text-orientation: upright; font-family: var(--brush); color: var(--ink); line-height: 1.25; letter-spacing: .04em }
+/* 文字の大きさは短冊ごとに JavaScript で決める（stripName）。2行は幅いっぱい、1行は大きめ */
+.tz .name { writing-mode: vertical-rl; text-orientation: upright; font-family: var(--marker); color: var(--ink); line-height: 1.08; letter-spacing: 0; white-space: nowrap }
 .tz:focus-visible, .chip:focus-visible, .tab:focus-visible, .row a:focus-visible, .btn:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
 .stamp { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shu);
   color: var(--shu); font-size: 12px; font-weight: 700; display: grid; place-items: center; transform: rotate(-12deg) }
@@ -69,7 +71,7 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 /* 今日の1品 */
 .today { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start }
 .today .tz { width: 96px; min-height: 360px; padding: 12px 0 16px; gap: 12px }
-.today .tz .name { font-size: 22px; max-height: 320px }
+.today .tz .name { max-height: 320px }
 .today .info { display: grid; gap: 10px; min-width: 0 }
 .today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
 .today .dish { font-family: var(--brush); font-size: 24px; line-height: 1.3; margin: 0; text-wrap: balance }
@@ -91,7 +93,7 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .wall ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px }
 .wall .tz { width: 64px; height: 300px; padding: 10px 0 10px; gap: 8px; justify-content: flex-start }
 /* 料理名は伸ばさずに上に詰める（伸ばすと iPhone の Safari・Chrome で縦書きが下に寄るため）。日付は一番下へ */
-.wall .tz .name { font-size: 16px; max-height: 230px; flex: none }
+.wall .tz .name { max-height: 230px; flex: none }
 .wall .tz .d { margin-top: auto; font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
 .wall .tz:hover { transform: translateY(-2px) }
 @media (prefers-reduced-motion: no-preference) { .wall .tz { transition: transform .15s } }
@@ -185,7 +187,7 @@ const plain = s => String(s).replace(/／/g, "");
 const zen = s => String(s).replace(/[!-~]/g, c => String.fromCharCode(c.charCodeAt(0) + 0xFEE0)).replace(/ /g, "");
 // 長い料理名は、文節の切れ目のうち2行の長さがいちばんそろう所で分ける
 const BREAK_AFTER = "のとでにを風＆×・、";
-function strip(s, max = 8) {
+function splitDish(s, max = 8) {
   const z = zen(s);
   let parts = z.includes("／") ? z.split("／", 2) : [z];
   if (parts.length === 1 && z.length > max) {
@@ -197,7 +199,16 @@ function strip(s, max = 8) {
     }
     if (best > 0) parts = [z.slice(0, best), z.slice(best)];
   }
-  return parts.map(p => esc(p.replace(/[・、]$/, ""))).join("<br>");
+  return parts.map(p => p.replace(/[・、]$/, ""));
+}
+// 短冊の料理名。w・h は文字を書ける幅と高さ（px）。手書きの品書きらしく、
+// 2行は2行で幅いっぱいに、1行は2行の時より大きく（幅の8割）書く。縦に入りきらなければ小さくする
+function stripName(s, w, h) {
+  const parts = splitDish(s);
+  const longest = Math.max(...parts.map(p => p.length));
+  const byWidth = parts.length > 1 ? w / (parts.length * 1.08) : w * 0.8;
+  const size = Math.floor(Math.min(byWidth, h / longest));
+  return `<span class="name" style="font-size:${size}px">${parts.map(esc).join("<br>")}</span>`;
 }
 const srcLabel = x => (x.official ? "公式 " : "") + SRC[x.source];
 
@@ -214,7 +225,7 @@ function tags(x, withSec = true) {
 // 今日の一品
 const t = ones[0];
 document.getElementById("today").innerHTML = `
-  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span><span class="name">${strip(t.dish)}</span></a>
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="stamp">新</span>${stripName(t.dish, 88, 320)}</a>
   <div class="info">
     <div class="date">${fmt(t.added)}の一品・${esc(t.gyosu_item)}</div>
     <p class="dish">${esc(plain(t.dish))}</p>
@@ -229,7 +240,7 @@ const wallEl = document.getElementById("wall");
 const fit = Math.max(1, Math.floor((wallEl.parentElement.clientWidth + GAP) / (STRIP + GAP)));
 wallEl.innerHTML = ones.slice(0, fit).map(x => `
   <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
-    <span class="stamp">新</span><span class="name">${strip(x.dish)}</span><span class="d">${fmt(x.added)}</span></a></li>`).join("");
+    <span class="stamp">新</span>${stripName(x.dish, 60, 230)}<span class="d">${fmt(x.added)}</span></a></li>`).join("");
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
