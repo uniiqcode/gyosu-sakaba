@@ -42,7 +42,7 @@ def main():
         body += ["- 今日の1品はもう載せてあるので、今日は集めた結果だけを記録します"]
     else:
         body += [line(x) for x in chosen] or ["- ストックが空なので、今日は載せるものがありません"]
-    if any(x["section"] == gyosu.UNSORTED for x in chosen):
+    if any(x["kind"] == "one" and x["section"] == gyosu.UNSORTED for x in chosen):   # まとめは区分を使わない
         body += ["", "⚠ 区分が「未分類」です。`data/recipes.json` の `section` を焼き物・揚げ物・煮物・炒め物・小鉢・〆 のどれかに直してください。"]
     year_ago = str(int(day[:4]) - 1) + day[4:]
     if any((x.get("posted") or "") < year_ago for x in chosen):

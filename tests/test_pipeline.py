@@ -73,6 +73,10 @@ class Classify(unittest.TestCase):
         self.assertEqual(gyosu.clean_title("【業務スーパー】冷凍赤魚の煮付け‼️ - YouTube"), "冷凍赤魚の煮付け")
         self.assertEqual(gyosu.clean_title("【3ステップ】旨辛！もちもちビビン麺｜業務スーパーミラクルレシピ"), "旨辛 もちもちビビン麺")
         self.assertEqual(gyosu.clean_title("鶏皮ぎょうざ｜業務スーパー"), "鶏皮ぎょうざ")
+        # 料理名が【】の中にだけあるときは、【】の中を使う
+        self.assertEqual(gyosu.clean_title("おかわりしたくなる‼︎【きのこ&ツナの炊き込みごはん】"), "きのこ&ツナの炊き込みごはん")
+        # 外に料理名があれば、【】の中は飾りとして消す
+        self.assertEqual(gyosu.clean_title("【ワンパン煮込み】業務スーパーの鶏で照り焼き"), "鶏で照り焼き")
 
     def test_review(self):
         self.assertEqual(gyosu.classify("【業務スーパー】しめじの値段が198円 実際に使ってみた感想", "レシピ"), "商品の感想")
