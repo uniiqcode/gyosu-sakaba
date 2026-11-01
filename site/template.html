@@ -39,7 +39,7 @@
   color-scheme: dark }
 
 * { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.7 }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16.5px; font-weight: 500; line-height: 1.7 }
 a { color: inherit }
 .wrap { max-width: 480px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 
@@ -51,15 +51,17 @@ a { color: inherit }
   background: linear-gradient(to bottom, rgba(8, 10, 20, 0) 50%, rgba(8, 10, 20, .55) 72%, rgba(8, 10, 20, .9) 100%) }
 .hero h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
 .sub { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; display: grid; gap: 2px; text-align: right;
-  color: #FFFFFF; font-size: 12px; text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+  color: #FFFFFF; font-size: 13px; text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
   padding: 0 max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)) }
-.sub b { font-family: var(--brush); font-weight: 400; font-size: 20px; letter-spacing: .06em }
+.sub b { font-family: var(--brush); font-weight: 400; font-size: 23px; letter-spacing: .06em }
 
 section { padding-block: 28px 4px }
-h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4px; text-wrap: balance }
-.lead { color: var(--muted); font-size: 13px; margin: 0 0 16px }
+h2 { font-family: var(--brush); font-weight: 400; font-size: 30px; margin: 0 0 4px; text-wrap: balance }
+.lead { color: var(--muted); font-size: 14.5px; margin: 0 0 16px }
 
 /* 短冊 */
+/* 筆文字（Yuji Syuku）は太さが1種類しかないので、同じ色の細い縁取りで太く見せる */
+h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentColor }
 /* 短冊は黄色の紙。紙の繊維のムラを薄く重ね、下の方をわずかに暗くして反りを出す */
 .tz { background-color: var(--paper); color: var(--ink);
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 30%, rgba(120, 80, 0, .06) 80%, rgba(120, 80, 0, .12)),
@@ -81,19 +83,19 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 
 /* 今日の1品 */
 .today { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start }
-.today .tz { width: 96px; min-height: 360px; padding: 47px 0 16px; gap: 12px }
+.today .tz { width: 96px; padding: 47px 0 18px; gap: 12px }
 .today .mark { width: 54px; height: 54px; margin-left: -27px }
-.today .tz .name { max-height: 320px }
+.today .tz .name { max-height: 240px }
 .today .info { display: grid; gap: 10px; min-width: 0 }
-.today .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
-.today .dish { font-family: var(--brush); font-size: 24px; line-height: 1.3; margin: 0; text-wrap: balance }
-.orig { font-size: 13px; color: var(--muted); overflow-wrap: anywhere }
+.today .date { font-size: 14.5px; color: var(--muted); font-variant-numeric: tabular-nums }
+.today .dish { font-family: var(--brush); font-size: 27px; line-height: 1.3; margin: 0; text-wrap: balance }
+.orig { font-size: 14.5px; color: var(--muted); overflow-wrap: anywhere }
 .btn { justify-self: start; display: inline-flex; gap: 8px; align-items: center; background: var(--ai); color: var(--ai-fg);
   text-decoration: none; padding: 10px 18px; font-weight: 500; border-radius: 2px }
 
 /* 札 */
 .tags { display: flex; flex-wrap: wrap; gap: 6px }
-.tag { font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); color: var(--fg); background: transparent; white-space: nowrap }
+.tag { font-size: 13.5px; padding: 1px 8px; border: 1px solid var(--line); color: var(--fg); background: transparent; white-space: nowrap }
 .tag.sec { border-color: var(--fg) }
 .tag.hit { border-color: var(--shu); color: var(--shu) }
 .tag.off { background: var(--fg); color: var(--bg); border-color: var(--fg) }
@@ -103,40 +105,40 @@ h2 { font-family: var(--brush); font-weight: 400; font-size: 26px; margin: 0 0 4
 .wall { overflow: hidden; direction: rtl }
 .wall li { direction: ltr }
 .wall ol { list-style: none; margin: 0; padding: 0 0 16px; display: flex; gap: 8px }   /* 下の余白は影の分 */
-.wall .tz { width: 64px; height: 300px; padding: 37px 0 10px; gap: 8px; justify-content: flex-start }
+.wall .tz { width: 64px; height: 100%; padding: 37px 0 8px; gap: 8px; justify-content: flex-start }   /* 高さは並んだ短冊でいちばん長いものに合わせる */
 .wall .mark { width: 42px; height: 42px; margin-left: -21px }
 /* 料理名は伸ばさずに上に詰める（伸ばすと iPhone の Safari・Chrome で縦書きが下に寄るため）。日付は一番下へ */
-.wall .tz .name { max-height: 230px; flex: none }
+.wall .tz .name { max-height: 180px; flex: none }
 .wall .tz .d { margin-top: auto; font-size: 11px; color: color-mix(in srgb, var(--ink) 60%, transparent); font-variant-numeric: tabular-nums }
 .wall li:hover { transform: translateY(-2px) }   /* .tz ではなく li を動かす（.tz を動かすと浮いた影が紙の上に出る） */
 @media (prefers-reduced-motion: no-preference) { .wall li { transition: transform .15s } }
 
 /* 品書きのタブ */
 .tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 2px solid var(--fg) }
-.tab { font: inherit; font-family: var(--brush); font-size: 18px; background: none; border: 0; color: var(--fg); padding: 8px 10px 6px; cursor: pointer }
+.tab { font: inherit; font-family: var(--brush); font-size: 20px; background: none; border: 0; color: var(--fg); padding: 8px 10px 6px; cursor: pointer }
 .tab[aria-selected="true"] { background: var(--fg); color: var(--bg) }
-.tab .n { font-family: var(--body); font-size: 11px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
+.tab .n { font-family: var(--body); font-size: 12px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
 .tab.special { color: var(--shu) }
 .tab.special[aria-selected="true"] { background: var(--shu); color: var(--paper) }
-.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-block: 12px; font-size: 13px }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-block: 12px; font-size: 14.5px }
 .filters .lbl { color: var(--muted); margin-right: 4px }
-.chip { font: inherit; font-size: 13px; background: var(--chip); color: var(--fg); border: 0; padding: 4px 12px; border-radius: 999px; cursor: pointer }
+.chip { font: inherit; font-size: 14.5px; background: var(--chip); color: var(--fg); border: 0; padding: 4px 12px; border-radius: 999px; cursor: pointer }
 .chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-fg) }
 .chip.hitote[aria-pressed="true"] { background: var(--shu); color: var(--paper) }
 
 .list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line) }
 .row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center }
 .row .main { min-width: 0; display: grid; gap: 4px }
-.row .dish { font-weight: 700; font-size: 16px }
+.row .dish { font-weight: 700; font-size: 18px }
 .row a { text-decoration: none; display: grid; gap: 2px; min-width: 0 }
 .row a:hover .dish { text-decoration: underline; text-underline-offset: 3px }
-.row .src { font-size: 12px; color: var(--muted); white-space: nowrap; text-align: right }
+.row .src { font-size: 13.5px; color: var(--muted); white-space: nowrap; text-align: right }
 .empty { color: var(--muted); padding: 16px 0 }
 
-.seas-head { font-family: var(--brush); font-size: 21px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
-.seas-head small { font-family: var(--body); font-size: 12px; color: var(--muted) }
+.seas-head { font-family: var(--brush); font-size: 24px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
+.seas-head small { font-family: var(--body); font-size: 13.5px; color: var(--muted) }
 
-footer { margin-top: 40px; border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 13px; color: var(--muted) }
+footer { margin-top: 40px; border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 14.5px; color: var(--muted) }
 footer p { margin: 0 0 6px }
 </style>
 
@@ -145,7 +147,7 @@ footer p { margin: 0 0 6px }
     <img src="hero-768.jpg" srcset="hero-768.jpg 768w, hero-1536.jpg 1536w" sizes="(max-width: 480px) 100vw, 480px"
       alt="夜の路地の酒場。手前の店に「業スー酒場」の提灯が下がっている" width="1536" height="1024">
     <h1>業スー酒場</h1>
-    <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理のレシピへのリンク集（非公式）</span></div>
+    <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理の<br>レシピへのリンク集（非公式）</span></div>
   </div>
 </header>
 
@@ -157,7 +159,7 @@ footer p { margin: 0 0 6px }
 
   <section aria-labelledby="h-new">
     <h2 id="h-new">新着</h2>
-    <p class="lead">毎日1品ずつ貼っていきます。右がいちばん新しい品です。</p>
+    <p class="lead">毎日1品ずつ貼ります。右がいちばん新しい品。</p>
     <div class="wall"><ol id="wall"></ol></div>
   </section>
 
@@ -259,7 +261,7 @@ function tags(x, withSec = true) {
 // 今日の一品
 const t = ones[0];
 document.getElementById("today").innerHTML = `
-  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener">${newMark(t.id)}${stripName(t.dish, 88, 320)}</a>
+  <a class="tz" href="${esc(t.url)}" target="_blank" rel="noopener">${newMark(t.id)}${stripName(t.dish, 88, 240)}</a>
   <div class="info">
     <div class="date">${fmt(t.added)}の一品・${esc(t.gyosu_item)}</div>
     <p class="dish">${esc(plain(t.dish))}</p>
@@ -274,7 +276,7 @@ const wallEl = document.getElementById("wall");
 const fit = Math.max(1, Math.floor((wallEl.parentElement.clientWidth + GAP) / (STRIP + GAP)));
 wallEl.innerHTML = ones.slice(0, fit).map(x => `
   <li><a class="tz" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">
-    ${newMark(x.id)}${stripName(x.dish, 60, 230)}<span class="d">${fmt(x.added)}</span></a></li>`).join("");
+    ${newMark(x.id)}${stripName(x.dish, 60, 180)}<span class="d">${fmt(x.added)}</span></a></li>`).join("");
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
