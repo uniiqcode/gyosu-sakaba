@@ -6,6 +6,8 @@
 | `chochin-prompt.md` | 提灯の絵を ChatGPT に頼むプロンプト |
 | `chochin-chatgpt-original.png` | ChatGPT が作った提灯の絵（2026-10-31）。採用。「スー」は縦中横（横並び）、背景は黒（夜に灯っている表現） |
 | `alley-prompt.md` | 夜の路地の絵（ページ上部の背景）を ChatGPT に頼むプロンプト |
+| `alley-lantern-text-prompt.md` | 路地の絵の提灯の文字を、曲面と灯りになじませて描き直してもらうプロンプト（2026-11-01、5回） |
+| `alley-lantern-text-v2.png`〜`v6.png` | その描き直しの途中の絵。**v6 を採用**し、ページ上部の絵を差し替えた |
 | `alley-chatgpt-original.png` | ChatGPT が作った夜の路地の絵（2026-10-31）。採用。ページ上部の背景にした（`site/assets/hero-768.jpg`・`hero-1536.jpg` は縮めて軽くしたもの）。文字を重ねる下の方の暗いグラデーションはページ側（`site/template.html` の `.hero`）でかけている |
 | `logo-chatgpt-original.webp` | ChatGPT が作ったロゴの元の画像（2026-10-30）。文字以外の緑（円・マスの線）があったので、Claude が消して `site/assets/logo-mark.png` にした。アイコン（タブ・ホーム画面）に使う。ページ上部は夜の路地の絵にしたので、ページには出していない |
 
