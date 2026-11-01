@@ -9,37 +9,31 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Yusei+Magic&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
 /* 居酒屋の壁: のれんの下に、短冊（縦書きの品書き）を貼っていく。スマホの縦向き専用（幅480pxまで） */
+/* 古い酒場の白壁に、黄色の短冊を貼った店内。暗い表示の端末でも同じ見た目にする（暗い色の組み合わせは作らない） */
 :root {
-  --bg: #EEEDE7;        /* 漆喰の壁 */
+  color-scheme: light;
+  --bg: #E7E0CF;        /* 古い酒場の白壁（少し黄ばんでくすんだ漆喰） */
   --fg: #1E1F24;        /* 墨 */
-  --muted: #676A72;
-  --line: #D6D4CB;
+  --muted: #5F5D57;
+  --line: #CFC6B2;
   --ai: #1F3A5F;        /* 藍ののれん */
   --ai-fg: #F4F2EC;
   --shu: #B8402B;       /* 朱（強調） */
-  --red-marker: #D3261C; /* 短冊の「新」の二重丸（赤い油性マジック）。短冊の紙は暗い表示でも白いので、色は変えない */
-  --paper: #F3D768;     /* 短冊の紙（黄色）。暗い表示でも同じ色 */
+  --red-marker: #D3261C; /* 短冊の新着の二重丸（赤い油性マジック） */
+  --paper: #F3D768;     /* 短冊の紙（黄色） */
   --ink: #1E1F24;
-  --chip: #E3E1D8;
+  --chip: #DCD3BF;
   --chip-on: #1F3A5F;
   --chip-on-fg: #F4F2EC;
   --brush: "Yuji Syuku", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --marker: "Yusei Magic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;   /* 短冊の品書き（太いマジックの手書き） */
   --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
-  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
-  --paper: #F3D768; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
-  color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #12161E; --fg: #E6E4DE; --muted: #9A9DA6; --line: #2A303C;
-  --ai: #2D4D7A; --ai-fg: #F1EFE8; --shu: #E0664E;
-  --paper: #F3D768; --ink: #1E1F24; --chip: #232A36; --chip-on: #E9E4D6; --chip-on-fg: #12161E;
-  color-scheme: dark }
-
 * { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16.5px; font-weight: 500; line-height: 1.7 }
+/* 白壁: 大きくゆるいシミのムラと、漆喰の細かいざらつきを重ねる */
+body { margin: 0; background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='.28'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .24 0 0 0 1.4 -.55'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23s)'/%3E%3C/svg%3E");
+  color: var(--fg); font-family: var(--body); font-size: 16.5px; font-weight: 500; line-height: 1.7 }
 a { color: inherit }
 .wrap { max-width: 480px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 
