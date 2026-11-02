@@ -115,12 +115,17 @@ h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentCo
 .tab .n { font-family: var(--body); font-size: 12px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
 .tab.special { color: var(--shu) }
 .tab.special[aria-selected="true"] { background: var(--shu); color: var(--paper) }
-.tab.saved { color: var(--blue); font-family: var(--marker) }
+.tab.saved { color: var(--blue) }
 .tab.saved[aria-selected="true"] { background: var(--blue); color: #FFFFFF }
 /* 保存ボタン。押すと青い ✔ になる（保存はこのブラウザの中だけに残す） */
-.save { font: inherit; font-size: 13.5px; font-weight: 700; min-width: 3.6em; min-height: 32px; padding: 2px 10px; cursor: pointer;
+.save { display: inline-grid; place-items: center; width: 64px; height: 32px; padding: 0; cursor: pointer;
+  font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1;
   border: 1.5px solid var(--blue); border-radius: 4px; background: transparent; color: var(--blue) }
-.save[aria-pressed="true"] { background: var(--blue); color: #FFFFFF; font-family: var(--marker); font-size: 18px; line-height: 1 }
+/* 保存した品は、同じ枠の中を青で塗り、チェックを白抜きにする */
+.save[aria-pressed="true"] { background: var(--blue); color: #FFFFFF }
+/* チェックは文字（✔）ではなく線で描く。端末によって ✔ が絵文字になり、色が効かないため */
+.check { display: block; width: 20px; height: 20px }
+.tab.saved .check { display: inline-block; width: 20px; height: 20px; vertical-align: -3px }
 .save:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
 .today .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
 .savedat { display: block; color: var(--blue); font-size: 12.5px }
@@ -192,7 +197,8 @@ footer p { margin: 0 0 6px }
 const ITEMS = __DATA__;
 const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
 const SEAS_TAB = "調味料が主役";
-const SAVED_TAB = "✔";
+const SAVED_TAB = "✔";   // タブの名前（中身は CHECK の線で描く）
+const CHECK = `<svg class="check" viewBox="0 0 24 24" aria-hidden="true"><polyline points="4.5,12.5 10,18 19.5,6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 // 保存: { id: 保存した日時（ISO） }。このブラウザの localStorage だけに残す（使えない時は、開いている間だけ覚える）
 const SAVE_KEY = "gyosu-sakaba:saved";
 let saved = {};
@@ -202,7 +208,7 @@ function toggleSave(id) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(saved)); } catch (e) { /* 保存できない環境では、開いている間だけ覚える */ }
 }
 const saveBtn = x => `<button class="save" type="button" data-save="${esc(x.id)}" aria-pressed="${!!saved[x.id]}"
-  aria-label="${saved[x.id] ? "保存を外す" : "保存する"}">${saved[x.id] ? "✔" : "保存"}</button>`;
+  aria-label="${saved[x.id] ? "保存を外す" : "保存する"}">${saved[x.id] ? CHECK : "保存"}</button>`;
 const fmtSaved = iso => { const d = new Date(iso); return `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")} 保存`; };
 const GROUPS = ["肉", "魚介", "野菜", "豆腐・大豆・こんにゃく", "冷凍惣菜・加工品", "調味料", "麺・粉もの"];
 const SRC = { youtube: "YouTube", blog: "ブログ", web: "記事" };
@@ -307,7 +313,7 @@ function renderTabs() {
     const n = pool(tb).filter(x => inTab(x, tb)).length;
     const cls = tb === SEAS_TAB ? " special" : tb === SAVED_TAB ? " saved" : "";
     const label = tb === SAVED_TAB ? ` aria-label="保存したもの"` : "";
-    return `<button class="tab${cls}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}"${label}>${tb}<span class="n">${n}</span></button>`;
+    return `<button class="tab${cls}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}"${label}>${tb === SAVED_TAB ? CHECK : tb}<span class="n">${n}</span></button>`;
   }).join("");
 }
 function renderFilters() {
