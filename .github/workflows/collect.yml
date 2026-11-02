@@ -1,0 +1,81 @@
+# 毎朝、新しい動画・記事を集めてストックにためる。PR は作らない。
+# 集めた結果（ストック・一度見た URL）は main ではなく collect-data ブランチに記録する。
+# 予定（main の data/recipes.json）が残り2日分以下になったら、Issue でお知らせする。
+name: 毎日の収集
+
+on:
+  schedule:
+    - cron: "10 20 * * *"   # 毎日 5:10（日本時間）。GitHub の混み具合で遅れることがある
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+env:
+  DATA_BRANCH: collect-data
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: テスト
+        run: python3 -m unittest discover -s tests
+
+      - name: これまでのストックを読む
+        run: |
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" >/dev/null; then
+            git fetch origin "$DATA_BRANCH"
+            git checkout "origin/$DATA_BRANCH" -- data/stock.json data/seen.tsv || true
+            git checkout "origin/$DATA_BRANCH" -- data/last_collect.json || true
+          fi
+
+      - name: 集める
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python3 scripts/collect.py
+
+      - name: 集めた結果を collect-data ブランチに記録する
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          D="$RUNNER_TEMP/data-branch"
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" >/dev/null; then
+            git worktree add -B "$DATA_BRANCH" "$D" "origin/$DATA_BRANCH"
+          else
+            git worktree add -b "$DATA_BRANCH" "$D" HEAD
+          fi
+          cp data/stock.json data/seen.tsv data/last_collect.json "$D/data/"
+          cd "$D"
+          git add data/stock.json data/seen.tsv data/last_collect.json
+          git commit -m "収集 $(TZ=Asia/Tokyo date +%F)" || echo "変わったところはない"
+          git push origin "$DATA_BRANCH"
+
+      - name: 予定が残り2日分以下ならお知らせする
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          left=$(python3 scripts/remaining.py)
+          stock=$(python3 -c "import json;print(sum(x['kind']=='one' for x in json.load(open('data/stock.json'))))")
+          title="【業スー酒場】予定が残り少なくなりました"
+          open=$(gh issue list --state open --search "in:title 予定が残り少なく" --json number --jq '.[0].number')
+          if [ "$left" -le 2 ]; then
+            body="明日以降の予定が、あと ${left} 日分です（ストックの1品は ${stock} 件）。
+          次の7日分の候補を出してください。Claude に「7日分出して」と頼むか、Actions の「7日分の候補を出す」を Run workflow で動かします。
+          7日分の PR をマージすると、このお知らせは次の収集の時に自動で閉じます。"
+            if [ -z "$open" ]; then gh issue create --title "$title" --body "$body"; else gh issue comment "$open" --body "$body"; fi
+          elif [ -n "$open" ]; then
+            gh issue close "$open" --comment "予定が ${left} 日分に増えたので閉じます。"
+          fi
