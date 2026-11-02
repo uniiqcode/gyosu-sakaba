@@ -20,6 +20,7 @@
   --ai-fg: #F4F2EC;
   --shu: #B8402B;       /* 朱（強調） */
   --red-marker: #D3261C; /* 短冊の新着の二重丸（赤い油性マジック） */
+  --blue: #1F5BB8;       /* 保存の ✔（青いマジック） */
   --paper: #F3D768;     /* 短冊の紙（黄色） */
   --ink: #1E1F24;
   --chip: #DCD3BF;
@@ -114,6 +115,15 @@ h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentCo
 .tab .n { font-family: var(--body); font-size: 12px; margin-left: 4px; opacity: .7; font-variant-numeric: tabular-nums }
 .tab.special { color: var(--shu) }
 .tab.special[aria-selected="true"] { background: var(--shu); color: var(--paper) }
+.tab.saved { color: var(--blue); font-family: var(--marker) }
+.tab.saved[aria-selected="true"] { background: var(--blue); color: #FFFFFF }
+/* 保存ボタン。押すと青い ✔ になる（保存はこのブラウザの中だけに残す） */
+.save { font: inherit; font-size: 13.5px; font-weight: 700; min-width: 3.6em; min-height: 32px; padding: 2px 10px; cursor: pointer;
+  border: 1.5px solid var(--blue); border-radius: 4px; background: transparent; color: var(--blue) }
+.save[aria-pressed="true"] { background: var(--blue); color: #FFFFFF; font-family: var(--marker); font-size: 18px; line-height: 1 }
+.save:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px }
+.today .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+.savedat { display: block; color: var(--blue); font-size: 12.5px }
 .filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-block: 12px; font-size: 14.5px }
 .filters .lbl { color: var(--muted); margin-right: 4px }
 .chip { font: inherit; font-size: 14.5px; background: var(--chip); color: var(--fg); border: 0; padding: 4px 12px; border-radius: 999px; cursor: pointer }
@@ -126,7 +136,7 @@ h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentCo
 .row .dish { font-weight: 700; font-size: 18px }
 .row a { text-decoration: none; display: grid; gap: 2px; min-width: 0 }
 .row a:hover .dish { text-decoration: underline; text-underline-offset: 3px }
-.row .src { font-size: 13.5px; color: var(--muted); white-space: nowrap; text-align: right }
+.row .src { font-size: 13.5px; color: var(--muted); white-space: nowrap; text-align: right; display: grid; gap: 6px; justify-items: end }
 .empty { color: var(--muted); padding: 16px 0 }
 
 .seas-head { font-family: var(--brush); font-size: 24px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
@@ -174,6 +184,7 @@ footer p { margin: 0 0 6px }
   <footer>
     <p>業務スーパー（株式会社神戸物産）とは関係のない、非公式のページです。</p>
     <p>レシピは各リンク先のページに載っています。このページには料理名とリンクだけを載せています。</p>
+    <p>［保存］はこのスマホのブラウザの中だけに残ります。機種やブラウザを変えると引き継がれません。</p>
   </footer>
 </main>
 
@@ -181,6 +192,18 @@ footer p { margin: 0 0 6px }
 const ITEMS = __DATA__;
 const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
 const SEAS_TAB = "調味料が主役";
+const SAVED_TAB = "✔";
+// 保存: { id: 保存した日時（ISO） }。このブラウザの localStorage だけに残す（使えない時は、開いている間だけ覚える）
+const SAVE_KEY = "gyosu-sakaba:saved";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}") || {}; } catch (e) { saved = {}; }
+function toggleSave(id) {
+  if (saved[id]) delete saved[id]; else saved[id] = new Date().toISOString();
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(saved)); } catch (e) { /* 保存できない環境では、開いている間だけ覚える */ }
+}
+const saveBtn = x => `<button class="save" type="button" data-save="${esc(x.id)}" aria-pressed="${!!saved[x.id]}"
+  aria-label="${saved[x.id] ? "保存を外す" : "保存する"}">${saved[x.id] ? "✔" : "保存"}</button>`;
+const fmtSaved = iso => { const d = new Date(iso); return `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")} 保存`; };
 const GROUPS = ["肉", "魚介", "野菜", "豆腐・大豆・こんにゃく", "冷凍惣菜・加工品", "調味料", "麺・粉もの"];
 const SRC = { youtube: "YouTube", blog: "ブログ", web: "記事" };
 
@@ -261,7 +284,8 @@ document.getElementById("today").innerHTML = `
     <p class="dish">${esc(plain(t.dish))}</p>
     ${tags(t)}
     <div class="orig">${esc(t.title)}</div>
-    <a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
+    <div class="actions"><a class="btn" href="${esc(t.url)}" target="_blank" rel="noopener">レシピを見る（${srcLabel(t)}）</a>
+      <span id="today-save">${saveBtn(t)}</span></div>
   </div>`;
 
 // 新着（画面幅に入るぶんだけ）
@@ -274,18 +298,21 @@ wallEl.innerHTML = ones.slice(0, fit).map(x => `
 
 // 品書き
 let tab = SECTIONS[0], group = null, hitoteOnly = false;
-const inTab = (x, tb) => tb === SEAS_TAB ? !!x.seasoning : x.section === tb && x.kind === "one";
-const pool = tb => tb === SEAS_TAB ? newest.filter(x => x.seasoning) : ones;
+const inTab = (x, tb) => tb === SAVED_TAB ? !!saved[x.id] : tb === SEAS_TAB ? !!x.seasoning : x.section === tb && x.kind === "one";
+const pool = tb => tb === SEAS_TAB || tb === SAVED_TAB ? newest : ones;
 
 function renderTabs() {
-  const all = [...SECTIONS, SEAS_TAB];
+  const all = [...SECTIONS, SEAS_TAB, SAVED_TAB];
   document.getElementById("tabs").innerHTML = all.map(tb => {
     const n = pool(tb).filter(x => inTab(x, tb)).length;
-    return `<button class="tab${tb === SEAS_TAB ? " special" : ""}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}">${tb}<span class="n">${n}</span></button>`;
+    const cls = tb === SEAS_TAB ? " special" : tb === SAVED_TAB ? " saved" : "";
+    const label = tb === SAVED_TAB ? ` aria-label="保存したもの"` : "";
+    return `<button class="tab${cls}" role="tab" id="tab-${all.indexOf(tb)}" aria-selected="${tb === tab}" data-tab="${tb}"${label}>${tb}<span class="n">${n}</span></button>`;
   }).join("");
 }
 function renderFilters() {
   if (tab === SEAS_TAB) { document.getElementById("filters").innerHTML = `<span class="lbl">業務スーパーの調味料ごとに並べています</span>`; return; }
+  if (tab === SAVED_TAB) { document.getElementById("filters").innerHTML = `<span class="lbl">保存した品を、新しく保存した順に並べています</span>`; return; }
   const base = ones.filter(x => inTab(x, tab));
   const gs = GROUPS.filter(g => base.some(x => x.item_group === g));
   document.getElementById("filters").innerHTML = `<span class="lbl">仕入れ</span>` +
@@ -293,12 +320,18 @@ function renderFilters() {
     gs.map((g, i) => `<button class="chip" id="g-${i}" aria-pressed="${group === g}" data-g="${g}">${g}</button>`).join("") +
     `<button class="chip hitote" id="g-hitote" aria-pressed="${hitoteOnly}" data-h="1">ひと手間だけ</button>`;
 }
-const row = (x, withSec) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
+const row = (x, withSec, showSaved = false) => `<li class="row"><div class="main"><a href="${esc(x.url)}" target="_blank" rel="noopener">
   <span class="dish">${esc(plain(x.dish))}</span><span class="orig">${esc(x.title)}</span></a>${tags(x, withSec)}</div>
-  <div class="src">${srcLabel(x)}${x.kind === "one" ? `<br>${fmt(x.added)}` : ""}</div></li>`;
+  <div class="src">${saveBtn(x)}<span>${srcLabel(x)}${x.kind === "one" ? `<br>${fmt(x.added)}` : ""}${showSaved && saved[x.id] ? `<span class="savedat">${fmtSaved(saved[x.id])}</span>` : ""}</span></div></li>`;
 
 function renderMenu() {
   const el = document.getElementById("menu");
+  if (tab === SAVED_TAB) {
+    const xs = newest.filter(x => saved[x.id]).sort((a, b) => saved[b.id].localeCompare(saved[a.id]));
+    el.innerHTML = xs.length ? `<ul class="list">${xs.map(x => row(x, true, true)).join("")}</ul>`
+      : `<p class="empty">まだ保存した品はありません。料理の横の［保存］を押すと、ここに並びます。</p>`;
+    return;
+  }
   if (tab === SEAS_TAB) {
     const by = {};
     newest.filter(x => x.seasoning).forEach(x => (by[x.seasoning] ||= []).push(x));
@@ -322,5 +355,14 @@ document.getElementById("filters").addEventListener("click", e => {
 render();
 
 // まとめて見る
-document.getElementById("sets").innerHTML = sets.map(x => row(x, false)).join("");
+const renderSets = () => { document.getElementById("sets").innerHTML = sets.map(x => row(x, false)).join(""); };
+renderSets();
+
+// 保存ボタン（どこで押しても同じ品の保存が切り替わる）
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-save]"); if (!b) return;
+  toggleSave(b.dataset.save);
+  document.getElementById("today-save").innerHTML = saveBtn(t);
+  renderTabs(); renderMenu(); renderSets();
+});
 </script>
