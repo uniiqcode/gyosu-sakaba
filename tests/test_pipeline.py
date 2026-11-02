@@ -41,6 +41,15 @@ class Classify(unittest.TestCase):
 
     def test_set(self):
         self.assertEqual(gyosu.classify("業務スーパーの鶏むね肉2kgで7品作り置き", "")["kind"], "set")
+        self.assertEqual(gyosu.classify("業務スーパーの冷凍エビで三品", "")["kind"], "set")
+        # 「一品」はふつうの言葉なので、まとめにしない
+        self.assertEqual(gyosu.classify("お惣菜屋の鶏牛蒡煮♯おかず♯一品 #業務スーパー #料理", "")["kind"], "one")
+
+    def test_sweets_rejected(self):
+        self.assertEqual(gyosu.classify("混ぜて焼くだけ‼︎【さつまいも&黒ごまのマフィン】", "業務スーパー 簡単"), "除外の言葉（マフィン）")
+
+    def test_hashtags_removed(self):
+        self.assertEqual(gyosu.clean_title("お惣菜屋の鶏牛蒡煮♯お惣菜♯鶏牛蒡煮 #業務スーパー #料理"), "お惣菜屋の鶏牛蒡煮")
 
     def test_rejects(self):
         self.assertEqual(gyosu.classify("業務スーパー購入品紹介", "レシピ"), "除外の言葉（購入品）")
