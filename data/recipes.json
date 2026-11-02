@@ -1852,5 +1852,23 @@
   "hitote": true,
   "official": false,
   "added": "2026-10-31"
+ },
+ {
+  "id": "5b951acfb3",
+  "url": "https://www.youtube.com/watch?v=3XPJk6MbdNA",
+  "title": "お惣菜屋の鶏牛蒡煮♯お惣菜♯鶏牛蒡煮♯鶏もも肉♯牛蒡♯人参♯いんげん♯おかず♯一品 #業務スーパー #料理",
+  "source": "youtube",
+  "channel": "爺ぃのお惣菜料理とお菓子作り",
+  "posted": "2026-10-31",
+  "found": "2026-11-02",
+  "dish": "鶏牛蒡煮",
+  "section": "煮物",
+  "item_group": "肉",
+  "gyosu_item": "鶏もも肉",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": false,
+  "added": "2026-11-02"
  }
 ]
