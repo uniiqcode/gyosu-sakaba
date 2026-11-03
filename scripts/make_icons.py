@@ -30,6 +30,7 @@ def main():
     icon(mark, 512, 0.56).save(ASSETS / "icon-maskable-512.png")
     # ブラウザのタブ用。小さいので文字をできるだけ大きく
     icon(mark, 64, 0.94).save(ASSETS / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
+    icon(mark, 32, 0.94).save(ASSETS / "favicon-32.png")
     print("site/assets にアイコンを作った")
 
 
