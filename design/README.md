@@ -26,7 +26,7 @@
 | `icon-192.png`、`icon-512.png` | Android のホーム画面（切り抜かない表示） |
 | `icon-maskable-512.png` | Android の丸・角丸の切り抜き用。文字を直径80%の円に収めるため小さめ |
 | `apple-touch-icon.png` | iPhone のホーム画面 |
-| `favicon.ico` | ブラウザのタブ |
+| `favicon.ico`、`favicon-32.png` | ブラウザのタブ |
 
 ## 短冊のフォント
 
