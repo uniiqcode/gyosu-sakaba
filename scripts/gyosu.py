@@ -120,6 +120,8 @@ def recheck(item, rules):
     reason = title_reject(title, rules)
     if reason:
         return reason
+    if item.get("kind") == "set" and any(w in title for w in rules["set"]["ranking"]):
+        return "商品のランキング"
     section, _ = _first(rules["section"], title)
     if section is None and not any(w in title for w in rules["accept"]["gyosu"]):
         return "タイトルに業務スーパーも料理の言葉もない"
@@ -146,6 +148,8 @@ def classify(title, description="", url="", channel="", rules=None):
     if section is None and not any(w in title for w in rules["accept"]["gyosu"]):
         return "タイトルに業務スーパーも料理の言葉もない"
     kind = "set" if any(re.search(p, title) for p in rules["set"]["patterns"]) else "one"
+    if kind == "set" and any(w in title for w in rules["set"]["ranking"]):
+        return "商品のランキング"
     # 料理の言葉（煮・炒め・唐揚げなど）や「〇品」「作り置き」がタイトルにあれば、それもレシピの目印にする
     if section is None and kind == "one" and not any(w in text for w in rules["accept"]["recipe"]):
         return "レシピの目印がない"
