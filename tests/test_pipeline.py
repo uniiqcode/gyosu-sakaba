@@ -46,6 +46,14 @@ class Classify(unittest.TestCase):
         # 「一品」はふつうの言葉なので、まとめにしない
         self.assertEqual(gyosu.classify("お惣菜屋の鶏牛蒡煮♯おかず♯一品 #業務スーパー #料理", "")["kind"], "one")
 
+    def test_ranking_sets_rejected(self):
+        self.assertEqual(gyosu.classify("業務スーパーで逆にクソすぎる商品10選", "おすすめ"), "商品のランキング")
+        self.assertEqual(gyosu.classify("【業務スーパー】実際に買ってみて後悔した食材 6選", ""), "商品のランキング")
+        # 1品のレシピなら「商品」があっても載せる
+        self.assertIsInstance(gyosu.classify("【業務スーパー商品】仕込み０。冷凍野菜と豚肉で簡単おかずレシピ", ""), dict)
+        # レシピのまとめは載せる
+        self.assertEqual(gyosu.classify("業務スーパーの鶏むね肉2kgで7品作り置き", "")["kind"], "set")
+
     def test_sweets_rejected(self):
         self.assertEqual(gyosu.classify("混ぜて焼くだけ‼︎【さつまいも&黒ごまのマフィン】", "業務スーパー 簡単"), "除外の言葉（マフィン）")
         self.assertEqual(gyosu.classify("【業スー】1個60円‼︎レンチン♪するだけの『たい焼き』が美味しい♡", "簡単"), "除外の言葉（たい焼き）")
