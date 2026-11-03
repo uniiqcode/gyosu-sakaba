@@ -11,7 +11,8 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
 import collect  # noqa: E402
 import gyosu  # noqa: E402
-import publish  # noqa: E402
+import propose  # noqa: E402
+import remaining  # noqa: E402
 
 RSS = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>ブログ</title>
@@ -47,6 +48,7 @@ class Classify(unittest.TestCase):
 
     def test_sweets_rejected(self):
         self.assertEqual(gyosu.classify("混ぜて焼くだけ‼︎【さつまいも&黒ごまのマフィン】", "業務スーパー 簡単"), "除外の言葉（マフィン）")
+        self.assertEqual(gyosu.classify("【業スー】1個60円‼︎レンチン♪するだけの『たい焼き』が美味しい♡", "簡単"), "除外の言葉（たい焼き）")
 
     def test_hashtags_removed(self):
         self.assertEqual(gyosu.clean_title("お惣菜屋の鶏牛蒡煮♯お惣菜♯鶏牛蒡煮 #業務スーパー #料理"), "お惣菜屋の鶏牛蒡煮")
@@ -104,18 +106,18 @@ class Pick(unittest.TestCase):
             {"kind": "one", "section": gyosu.UNSORTED, "posted": "2026-10-28", "found": "2026-10-30"},
             {"kind": "one", "section": "煮物", "posted": "", "found": "2026-10-30"},
         ]
-        self.assertEqual(publish.pick(stock, "one")["posted"], "2026-10-28")
+        self.assertEqual(propose.pick(stock, "one")["posted"], "2026-10-28")
 
     def test_same_day_prefers_sorted(self):
         stock = [
             {"kind": "one", "section": gyosu.UNSORTED, "posted": "2026-10-28", "found": "2026-10-30"},
             {"kind": "one", "section": "揚げ物", "posted": "2026-10-28", "found": "2026-10-30"},
         ]
-        self.assertEqual(publish.pick(stock, "one")["section"], "揚げ物")
+        self.assertEqual(propose.pick(stock, "one")["section"], "揚げ物")
 
     def test_old_only_is_still_picked(self):
         stock = [{"kind": "one", "section": "焼き物", "posted": "2021-01-01", "found": "2026-10-30"}]
-        self.assertEqual(publish.pick(stock, "one")["posted"], "2021-01-01")
+        self.assertEqual(propose.pick(stock, "one")["posted"], "2021-01-01")
 
 
 class Pipeline(unittest.TestCase):
@@ -139,7 +141,7 @@ class Pipeline(unittest.TestCase):
         gyosu.ROOT, gyosu.RECIPES, gyosu.STOCK, gyosu.SEEN, gyosu.load_toml, gyosu.today, collect.get = self.saved
         self.tmp.cleanup()
 
-    def test_collect_then_publish(self):
+    def test_collect_then_propose(self):
         collect.main()
         stock = gyosu.load_json(gyosu.STOCK)
         self.assertEqual(sorted(x["dish"] for x in stock), ["冷凍赤魚の煮付け", "姜葱醤で鶏むねの甘辛炒め"])
@@ -149,19 +151,34 @@ class Pipeline(unittest.TestCase):
         collect.main()
         self.assertEqual(len(gyosu.load_json(gyosu.STOCK)), 2)
 
-        publish.main()
+        # 7日分を頼んでも、ストックにある2品だけを、今日（まだ1品がない）から1日1品で予定に入れる
+        propose.main(7)
         recipes = gyosu.load_json(gyosu.RECIPES)
-        self.assertEqual(len(recipes), 1)
-        self.assertEqual(recipes[0]["dish"], "姜葱醤で鶏むねの甘辛炒め")   # 投稿日が新しい方
-        self.assertEqual(recipes[0]["added"], "2026-10-30")
-        self.assertIn("姜葱醤で鶏むねの甘辛炒め", (gyosu.ROOT / "pr_body.md").read_text(encoding="utf-8"))
+        self.assertEqual([(r["added"], r["dish"]) for r in recipes],
+                         [("2026-10-30", "姜葱醤で鶏むねの甘辛炒め"), ("2026-10-31", "冷凍赤魚の煮付け")])   # 投稿日が新しい方から
+        self.assertIn("10月30日", (gyosu.ROOT / "pr_body.md").read_text(encoding="utf-8"))
+        self.assertEqual(remaining.remaining(recipes, "2026-10-30"), 1)
+        self.assertEqual(gyosu.load_json(gyosu.STOCK), stock)   # ストックは変えない
 
-        # 同じ日に2回動いても、2品目は載せない。PR の説明は作る
-        (gyosu.ROOT / "pr_body.md").unlink()
-        publish.main()
-        self.assertEqual(len(gyosu.load_json(gyosu.RECIPES)), 1)
-        self.assertIn("もう載せてある", (gyosu.ROOT / "pr_body.md").read_text(encoding="utf-8"))
+        # マージ後の収集で、予定に入った品はストックから外れる
+        collect.main()
+        self.assertEqual(gyosu.load_json(gyosu.STOCK), [])
 
+
+class Schedule(unittest.TestCase):
+    def test_first_day_follows_existing_plan(self):
+        recipes = [{"kind": "one", "added": "2026-11-05"}, {"kind": "set", "added": "2026-11-09"}]
+        self.assertEqual(propose.first_day(recipes, "2026-11-02").isoformat(), "2026-11-06")   # まとめの日付は数えない
+
+    def test_first_day_is_today_when_today_is_empty(self):
+        self.assertEqual(propose.first_day([{"kind": "one", "added": "2026-10-30"}], "2026-11-02").isoformat(), "2026-11-02")
+
+    def test_first_day_is_tomorrow_when_today_is_done(self):
+        self.assertEqual(propose.first_day([{"kind": "one", "added": "2026-11-02"}], "2026-11-02").isoformat(), "2026-11-03")
+
+    def test_remaining_counts_days_after_today(self):
+        recipes = [{"kind": "one", "added": d} for d in ("2026-11-02", "2026-11-03", "2026-11-04")]
+        self.assertEqual(remaining.remaining(recipes, "2026-11-02"), 2)
 
 if __name__ == "__main__":
     unittest.main()

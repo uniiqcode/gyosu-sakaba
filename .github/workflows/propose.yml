@@ -1,0 +1,56 @@
+# 頼まれた時に、ストックからいちばん新しい7日分の候補を選び、載せる日を付けた PR を作る。
+# 人は PR を確かめてマージするだけ。載せる日が来ると、その朝からページに出る。
+name: 7日分の候補を出す
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "何日分出すか"
+        default: "7"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: propose
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ストックを読む（collect-data ブランチ）
+        run: |
+          if git ls-remote --exit-code --heads origin collect-data >/dev/null; then
+            git fetch origin collect-data
+            git checkout origin/collect-data -- data/stock.json
+          fi
+
+      - name: 候補を選ぶ
+        run: python3 scripts/propose.py "${{ github.event.inputs.days }}"
+
+      - name: ページが作れるか確かめる
+        run: python3 scripts/build_site.py
+
+      - name: 日付
+        id: day
+        run: echo "day=$(TZ=Asia/Tokyo date +%F)" >> "$GITHUB_OUTPUT"
+
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: propose-days
+          delete-branch: true
+          title: "${{ github.event.inputs.days }}日分の候補（${{ steps.day.outputs.day }} に作成）"
+          body-path: pr_body.md
+          commit-message: "${{ github.event.inputs.days }}日分の候補"
+          add-paths: |
+            data/recipes.json

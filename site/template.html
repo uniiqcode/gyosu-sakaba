@@ -194,7 +194,9 @@ footer p { margin: 0 0 6px }
 </main>
 
 <script>
-const ITEMS = __DATA__;
+// 載せる日（added）が来た品だけを出す。日付は日本時間で決める（予定の品は、その日の朝から表に出る）
+const TODAY = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(new Date());
+const ITEMS = __DATA__.filter(x => !x.added || x.added <= TODAY);
 const SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"];
 const SEAS_TAB = "調味料が主役";
 const SAVED_TAB = "✔";   // タブの名前（中身は CHECK の線で描く）

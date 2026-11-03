@@ -98,7 +98,10 @@ def main():
     log, added = [], []
     # ルールを変えた時のために、ストックも今のルールで見直す
     stock = []
+    published = {gyosu.normalize_url(r["url"]) for r in gyosu.load_json(gyosu.RECIPES)}
     for x in gyosu.load_json(gyosu.STOCK):
+        if gyosu.normalize_url(x["url"]) in published:   # 予定に入った（マージされた）品はストックから外す
+            continue
         r = gyosu.recheck(x, rules)
         if isinstance(r, str):
             log.append((day, x["url"], f"ストックから外した: {r}"))
