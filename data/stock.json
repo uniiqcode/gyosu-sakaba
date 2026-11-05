@@ -2021,5 +2021,39 @@
   "kind": "one",
   "hitote": false,
   "official": false
+ },
+ {
+  "id": "0ad60c7ab6",
+  "url": "https://www.youtube.com/watch?v=mnU7Cl4qDYQ",
+  "title": "【業務スーパー】酒も米もすすむ‼️おすすめおつまみ13選✨年末年始｜2025年12月｜業務用スーパー",
+  "source": "youtube",
+  "channel": "おトクのまる",
+  "posted": "2026-09-21",
+  "found": "2026-11-05",
+  "dish": "酒も米もすすむ おすすめおつまみ13選 年末年始",
+  "section": "未分類",
+  "item_group": "いろいろ",
+  "gyosu_item": "",
+  "seasoning": null,
+  "kind": "set",
+  "hitote": false,
+  "official": false
+ },
+ {
+  "id": "050ea8a2db",
+  "url": "https://www.youtube.com/watch?v=3l6Agqm6xZs",
+  "title": "[神戸物産]業務スーパーのインスタントフォーは簡単絶品！-インスタントフォーチキン風味[世界のグルメを食べ尽くせ！]",
+  "source": "youtube",
+  "channel": "さらもで",
+  "posted": "2026-09-07",
+  "found": "2026-11-05",
+  "dish": "インスタントフォーは簡単絶品 インスタントフォーチキン風味",
+  "section": "未分類",
+  "item_group": "肉",
+  "gyosu_item": "チキン",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": false
  }
 ]
