@@ -2089,5 +2089,22 @@
   "kind": "one",
   "hitote": false,
   "official": false
+ },
+ {
+  "id": "9935bc7e67",
+  "url": "https://www.youtube.com/watch?v=Zdkj37G3UzE",
+  "title": "食べる具だくさんラー油｜業務スーパー",
+  "source": "youtube",
+  "channel": "業務スーパー公式チャンネル",
+  "posted": "2026-09-09",
+  "found": "2026-11-07",
+  "dish": "食べる具だくさんラー油",
+  "section": "未分類",
+  "item_group": "野菜",
+  "gyosu_item": "野菜",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": true
  }
 ]
