@@ -173,6 +173,30 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(gyosu.load_json(gyosu.STOCK), [])
 
 
+class Balance(unittest.TestCase):
+    @staticmethod
+    def item(section, posted):
+        return {"kind": "one", "section": section, "posted": posted, "found": "2026-11-01"}
+
+    def test_fewest_section_first_and_newest_inside(self):
+        stock = [self.item("〆", "2026-11-05"), self.item("〆", "2026-11-04"), self.item("煮物", "2026-11-06"),
+                 self.item("小鉢", "2026-10-01"), self.item("小鉢", "2026-10-20")]
+        recipes = [{"kind": "one", "section": "煮物"}] * 3 + [{"kind": "one", "section": "〆"}]
+        got = propose.balanced(stock, recipes, 3)
+        # ページに無い小鉢 → 1件の〆 → 小鉢（煮物は3件あるので後回し）。区分の中では新しい順
+        self.assertEqual([(x["section"], x["posted"]) for x in got],
+                         [("小鉢", "2026-10-20"), ("〆", "2026-11-05"), ("小鉢", "2026-10-01")])
+
+    def test_no_same_section_twice_in_a_row_when_avoidable(self):
+        stock = [self.item("〆", "2026-11-05"), self.item("〆", "2026-11-04"), self.item("揚げ物", "2026-09-01")]
+        got = propose.balanced(stock, [], 3)
+        self.assertEqual([x["section"] for x in got], ["〆", "揚げ物", "〆"])
+
+    def test_unsorted_only_as_last_resort(self):
+        stock = [self.item(gyosu.UNSORTED, "2026-11-07"), self.item("焼き物", "2025-01-01")]
+        self.assertEqual([x["section"] for x in propose.balanced(stock, [], 2)], ["焼き物", gyosu.UNSORTED])
+
+
 class Schedule(unittest.TestCase):
     def test_first_day_follows_existing_plan(self):
         recipes = [{"kind": "one", "added": "2026-11-05"}, {"kind": "set", "added": "2026-11-09"}]
