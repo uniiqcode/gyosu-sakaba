@@ -1,10 +1,13 @@
-"""ストックから、いちばん新しい7日分の候補を選び、載せる日を付けて data/recipes.json に足す。PR の説明文も作る。
+"""ストックから7日分の候補を選び、載せる日を付けて data/recipes.json に足す。PR の説明文も作る。
 
 使い方: python3 scripts/propose.py [日数]   （日数を省くと7日分）
 - 載せる日は、すでに予定に入っている最後の日の翌日から。今日の1品がまだなければ今日から
 - 1日に1品（あれば、まとめも1件）
-- 選び方: 投稿日が新しいものを最優先（古い動画・記事の商品は、もう売っていないかもしれないため）。
-  同じ投稿日なら区分が決まっているものを先に。古いものしかなければ古いものを選ぶ
+- 選び方（1品）: 区分がばらけることを優先する（balanced）。
+  1日ずつ、ページに載っている数（予定も含む）がいちばん少ない区分を選び、前の日と同じ区分はなるべく続けない。
+  区分の中では投稿日が新しいものから（古い動画・記事の商品は、もう売っていないかもしれないため）。
+  「未分類」は、ほかの区分のストックがない時だけ使う
+- 選び方（まとめ）: 投稿日が新しいものから
 - ストック（data/stock.json）は変えない。マージして載せた品は、次の収集の時にストックから外れる
 """
 import datetime
@@ -19,6 +22,35 @@ def ranked(stock, kind):
     # 投稿日が新しいもの → 区分が決まっているもの → 早く見つけたもの（投稿日が不明なものは最後）
     cands.sort(key=lambda x: (x.get("posted") or "", x["section"] != gyosu.UNSORTED, x["found"]), reverse=True)
     return cands
+
+
+def balanced(stock, recipes, days):
+    """区分がばらけるように1品を days 件選ぶ。"""
+    pools = {}
+    for x in ranked(stock, "one"):   # 区分ごとに、新しい順
+        pools.setdefault(x["section"], []).append(x)
+    unsorted = pools.pop(gyosu.UNSORTED, [])
+    count = {}
+    for r in recipes:
+        if r["kind"] == "one":
+            count[r["section"]] = count.get(r["section"], 0) + 1
+    chosen, prev = [], None
+    for _ in range(days):
+        live = [s for s in pools if pools[s]]
+        if not live:
+            if not unsorted:
+                break
+            chosen.append(unsorted.pop(0))
+            continue
+        # 少ない区分 → 前の日と違う区分。それでも並んだら、いちばん新しい品がある区分
+        first = min((count.get(s, 0), s == prev) for s in live)
+        tied = [s for s in live if (count.get(s, 0), s == prev) == first]
+        best = max(tied, key=lambda s: pools[s][0].get("posted") or "")
+        x = pools[best].pop(0)
+        chosen.append(x)
+        count[best] = count.get(best, 0) + 1
+        prev = best
+    return chosen
 
 
 def pick(stock, kind):
@@ -45,7 +77,7 @@ def main(days=7):
     today = gyosu.today()
     published = {gyosu.normalize_url(r["url"]) for r in recipes}
     stock = [x for x in stock if gyosu.normalize_url(x["url"]) not in published]
-    ones, sets = ranked(stock, "one")[:days], ranked(stock, "set")[:days]
+    ones, sets = balanced(stock, recipes, days), ranked(stock, "set")[:days]
     start = first_day(recipes, today)
 
     plan = []
