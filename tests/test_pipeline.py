@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
+import build_site  # noqa: E402
 import collect  # noqa: E402
 import gyosu  # noqa: E402
 import propose  # noqa: E402
@@ -195,6 +196,21 @@ class Balance(unittest.TestCase):
     def test_unsorted_only_as_last_resort(self):
         stock = [self.item(gyosu.UNSORTED, "2026-11-07"), self.item("焼き物", "2025-01-01")]
         self.assertEqual([x["section"] for x in propose.balanced(stock, [], 2)], ["焼き物", gyosu.UNSORTED])
+
+
+class Seo(unittest.TestCase):
+    def test_static_html_has_only_published_items(self):
+        items = [{"id": "a", "url": "https://e.x/a", "title": "A", "dish": "豚の／角煮", "section": "煮物", "kind": "one", "seasoning": None, "added": "2026-11-01"},
+                 {"id": "b", "url": "https://e.x/b", "title": "B", "dish": "未来の品", "section": "焼き物", "kind": "one", "seasoning": None, "added": "2026-12-01"}]
+        published = [x for x in items if x["added"] <= "2026-11-08"]
+        listing = build_site.all_list(published)
+        self.assertIn("豚の角煮", listing)          # 「／」は消す
+        self.assertNotIn("未来の品", listing)
+        ld = json.loads(build_site.json_ld(published))
+        self.assertEqual((ld["@type"], ld["numberOfItems"], ld["itemListElement"][0]["url"]), ("ItemList", 1, "https://e.x/a"))
+
+    def test_sitemap_uses_canonical_url(self):
+        self.assertIn("<loc>https://uniiqcode.com/gyosu-sakaba/</loc><lastmod>2026-11-08</lastmod>", build_site.sitemap("2026-11-08"))
 
 
 class Schedule(unittest.TestCase):

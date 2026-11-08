@@ -1,5 +1,19 @@
-<title>業スー酒場</title>
-<meta name="description" content="居酒屋の一品ネタ帳">
+<title>業スー酒場｜居酒屋の一品ネタ帳</title>
+<meta name="description" content="業務スーパーの食材で作れる料理のレシピを、居酒屋の店主向けに毎日1品ずつ紹介するリンク集。焼き物・揚げ物・煮物・小鉢・〆や、姜葱醤など調味料が主役の品から探せます（非公式）。">
+<!-- 検索対策（seo-uniiqcode スキル）。正式な URL は uniiqcode.com の方で書く -->
+<link rel="canonical" href="https://uniiqcode.com/gyosu-sakaba/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="業スー酒場">
+<meta property="og:title" content="業スー酒場｜居酒屋の一品ネタ帳">
+<meta property="og:description" content="業務スーパーの食材で作れる料理のレシピを、居酒屋の店主向けに毎日1品ずつ紹介するリンク集。焼き物・揚げ物・煮物・小鉢・〆や、姜葱醤など調味料が主役の品から探せます（非公式）。">
+<meta property="og:url" content="https://uniiqcode.com/gyosu-sakaba/">
+<meta property="og:image" content="https://uniiqcode.com/gyosu-sakaba/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" type="image/webp" href="hero-768.webp" imagesrcset="hero-768.webp 768w, hero-1536.webp 1536w" imagesizes="(max-width: 480px) 100vw, 480px">
+<script type="application/ld+json">__JSONLD__</script>
 <!-- ホーム画面に追加した時の名前・アイコン（iPhone は apple-*、Android は manifest を見る） -->
 <meta name="application-name" content="業スー酒場">
 <meta name="apple-mobile-web-app-title" content="業スー酒場">
@@ -150,6 +164,10 @@ h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentCo
 .row a:hover .dish { text-decoration: underline; text-underline-offset: 3px }
 .row .src { font-size: 13.5px; color: var(--muted); white-space: nowrap; text-align: right; display: grid; gap: 6px; justify-items: end }
 .empty { color: var(--muted); padding: 16px 0 }
+.all summary { cursor: pointer; color: var(--muted); padding: 6px 0 }
+.all h3 { font-family: var(--brush); font-weight: 400; font-size: 20px; margin: 14px 0 4px }
+.all ul { margin: 0; padding-left: 1.2em; font-size: 15px; line-height: 1.9 }
+.all a { color: var(--fg) }
 
 .seas-head { font-family: var(--brush); font-size: 24px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
 .seas-head small { font-family: var(--body); font-size: 13.5px; color: var(--muted) }
@@ -160,7 +178,7 @@ footer p { margin: 0 0 6px }
 
 <header class="hero">
   <div class="scene">
-    <img src="hero-768.jpg" srcset="hero-768.jpg 768w, hero-1536.jpg 1536w" sizes="(max-width: 480px) 100vw, 480px"
+    <img src="hero-768.webp" srcset="hero-768.webp 768w, hero-1536.webp 1536w" sizes="(max-width: 480px) 100vw, 480px"
       alt="夜の路地の酒場。手前の店に「業スー酒場」の提灯が下がっている" width="1536" height="1024">
     <h1>業スー酒場</h1>
     <div class="sub"><b>居酒屋の一品ネタ帳</b><span>業務スーパーの食材で作る料理の<br>レシピへのリンク集（非公式）</span></div>
@@ -170,7 +188,7 @@ footer p { margin: 0 0 6px }
 <main class="wrap">
   <section aria-labelledby="h-today">
     <h2 id="h-today">今日の一品</h2>
-    <div class="today" id="today"></div>
+    <div class="today" id="today">__STATIC_TODAY__</div>
   </section>
 
   <section aria-labelledby="h-new">
@@ -191,6 +209,15 @@ footer p { margin: 0 0 6px }
     <h2 id="h-set">まとめて見る</h2>
     <p class="lead">1本の動画・記事に何品も入っているものです。</p>
     <ul class="list" id="sets"></ul>
+  </section>
+
+  <!-- 載せた品の一覧。ページを作る時に HTML に書き込む（検索エンジンが読めるように。JavaScript がなくても見られる） -->
+  <section aria-labelledby="h-all">
+    <h2 id="h-all">すべての品書き</h2>
+    <details class="all">
+      <summary>__ALL_COUNT__品の一覧を開く</summary>
+      __ALL_LIST__
+    </details>
   </section>
 
   <footer>
