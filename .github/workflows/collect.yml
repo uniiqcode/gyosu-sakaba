@@ -1,6 +1,6 @@
 # 毎朝、新しい動画・記事を集めてストックにためる。PR は作らない。
 # 集めた結果（ストック・一度見た URL）は main ではなく collect-data ブランチに記録する。
-# 予定（main の data/recipes.json）が残り2日分以下になったら、Issue でお知らせする。
+# 予定（main の data/recipes.json）が残り2日分以下になったら、7日分の候補の PR を自動で作り、Issue でお知らせする。
 name: 毎日の収集
 
 on:
@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   issues: write
+  actions: write   # 予定が残り少ない時に「7日分の候補を出す」を動かすため
 
 concurrency:
   group: collect
@@ -63,7 +64,7 @@ jobs:
           git commit -m "収集 $(TZ=Asia/Tokyo date +%F)" || echo "変わったところはない"
           git push origin "$DATA_BRANCH"
 
-      - name: 予定が残り2日分以下ならお知らせする
+      - name: 予定が残り2日分以下なら、7日分の候補を作ってお知らせする
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -71,11 +72,20 @@ jobs:
           stock=$(python3 -c "import json;print(sum(x['kind']=='one' for x in json.load(open('data/stock.json'))))")
           title="【業スー酒場】予定が残り少なくなりました"
           open=$(gh issue list --state open --search "in:title 予定が残り少なく" --json number --jq '.[0].number')
+          pr=$(gh pr list --state open --head propose-days --json number --jq '.[0].number')
           if [ "$left" -le 2 ]; then
+            # 候補の PR がまだなければ作る（あれば作り直さない。確かめている途中の PR を消さないため）
+            if [ -z "$pr" ]; then
+              gh workflow run propose.yml -f days=7
+              note="7日分の候補の PR を自動で作りました（数分で届きます）。確かめてマージしてください。"
+            else
+              note="7日分の候補の PR（#${pr}）ができています。確かめてマージしてください。"
+            fi
             body="明日以降の予定が、あと ${left} 日分です（ストックの1品は ${stock} 件）。
-          次の7日分の候補を出してください。Claude に「7日分出して」と頼むか、Actions の「7日分の候補を出す」を Run workflow で動かします。
-          7日分の PR をマージすると、このお知らせは次の収集の時に自動で閉じます。"
-            if [ -z "$open" ]; then gh issue create --title "$title" --body "$body"; else gh issue comment "$open" --body "$body"; fi
+          ${note}
+          PR をマージすると、このお知らせは次の収集の時に自動で閉じます。"
+            if [ -z "$open" ]; then gh issue create --title "$title" --body "$body"
+            elif [ -z "$pr" ]; then gh issue comment "$open" --body "$body"; fi
           elif [ -n "$open" ]; then
             gh issue close "$open" --comment "予定が ${left} 日分に増えたので閉じます。"
           fi
