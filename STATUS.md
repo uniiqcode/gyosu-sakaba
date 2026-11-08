@@ -92,6 +92,8 @@
 - 2026-11-08: PR #29（区分の均等化）・#30（11/10〜11/16 の予定、区分を直した）をマージ
 - 2026-11-08: **検索対策（SEO）を入れた**（`uniiqcode/claude-skills` の `seo-uniiqcode` スキルの手順1〜7）→ `docs/seo.md`。正式な URL は https://uniiqcode.com/gyosu-sakaba/ 。title・description・canonical・OGP（og.jpg）・サイトマップ・構造化データ（ItemList）、今日の一品と「すべての品書き」を HTML に書き込む、ページ上部の絵を WebP に。予定の品を HTML に入れないよう、ページを毎日0:05に作り直す（この課題はスキルの記録にも追記）
 
+- 2026-11-08: PR #31（検索対策）をマージ。人が Google Search Console に `uniiqcode.com` を「ドメイン」プロパティで登録（Cloudflare の自動確認。TXT レコードは消さない）し、`https://uniiqcode.com/gyosu-sakaba/sitemap.xml` を送信した。サイトマップが公開されていることも人がブラウザで確かめた。Search Console の表示は送信直後で「取得できませんでした」（Google が読みに来るのを待つ）
+
 ## 次にやること
 
 | やること | 担当 |
@@ -100,7 +102,7 @@
 | 業務スーパーで仕入れている酒場の店主に感想を聞く（`docs/interview.md`） | 人 |
 | 聞いた感想から、直すことの優先順位を決める | 人＋Claude |
 | 候補の PR を見て、キーワードを少しずつ直す | 人＋Claude |
-| Search Console に uniiqcode.com を登録し、サイトマップを送信する（`docs/seo.md` の「公開後に人がすること」） | 人 |
+| Search Console でサイトマップが「成功しました」になるか、数日後に見る。URL 検査でトップの登録をリクエストする。X か LINE で共有した時の見え方を確かめる | 人 |
 
 ## 未決
 
