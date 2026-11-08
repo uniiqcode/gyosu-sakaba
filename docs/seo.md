@@ -32,3 +32,11 @@
 - X の投稿画面や LINE に URL を貼り、夜の路地の絵とタイトルが出る
 - Google の「リッチリザルト テスト」（https://search.google.com/test/rich-results ）に URL を入れて、エラーがない
 - PageSpeed Insights（https://pagespeed.web.dev/ ）でスマホの LCP が 2.5 秒以内
+
+## 訪問者数のカウンター（2026-11-08）
+
+- 数えるのは **GoatCounter**（無料、Cookie を使わない）。サイトのコードは `gyosusakaba`（コンビニ24Hと同じアカウントの2つ目のサイト）
+- ページに計測用のコード（`https://gc.zgo.at/count.js`、`data-goatcounter="https://gyosusakaba.goatcounter.com/count"`）を入れた
+- 毎日0:05のページの作り直しの時に、GoatCounter の API（`/api/v0/stats/total`）から、数え始めた日（2026-11-08）から前日までの訪問者数を受け取り、ページの最後に「訪問者数 ○○人（○月○日時点）」と書く。受け取れなかった日は書かない
+- API のトークンは GitHub の Secrets `GOATCOUNTER_TOKEN`（権限は Read statistics だけ、サイトは gyosusakaba だけ）。ページには出さない
+- ページの最後に「訪問者数は GoatCounter で数えています（個人を特定する情報は保存しません）」と書いた

@@ -32,6 +32,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python3 scripts/build_site.py
+        env:
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}   # 訪問者数を受け取るため（読むだけの権限）
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

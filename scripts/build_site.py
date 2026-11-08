@@ -5,11 +5,17 @@
   構造化データ）。予定の品（載せる日がまだ来ていないもの）は書き込まない。ページは毎日作り直す（pages.yml）
 - JavaScript 用のデータには予定の品も入れる（作り直しが遅れても、載せる日の朝に表に出るように）
 - sitemap.xml も作る（日付は作った日）
+- 環境変数 GOATCOUNTER_TOKEN があれば、GoatCounter から前日までの訪問者数を受け取り、ページの最後に書く
+  （受け取れなかった時は書かずにページを作る）
 """
+import datetime
 import html
 import json
+import os
 import shutil
 import sys
+import urllib.parse
+import urllib.request
 
 import gyosu
 
@@ -17,6 +23,28 @@ FIELDS = ["id", "url", "title", "source", "dish", "section", "item_group", "gyos
           "seasoning", "kind", "hitote", "official", "added"]
 SITE_URL = "https://uniiqcode.com/gyosu-sakaba/"   # 正式な URL（seo-uniiqcode スキル）
 SECTIONS = ["焼き物", "揚げ物", "煮物", "炒め物", "小鉢", "〆"]
+GOATCOUNTER = "https://gyosusakaba.goatcounter.com"   # 訪問者数（サイトのコードは gyosusakaba）
+COUNT_FROM = "2026-11-08"                             # 数え始めた日
+
+
+def visitors(token, today):
+    """前日までの訪問者数（同じ人が1日に何回見ても1人）。受け取れなければ None。"""
+    query = urllib.parse.urlencode({"start": COUNT_FROM, "end": today})
+    req = urllib.request.Request(f"{GOATCOUNTER}/api/v0/stats/total?{query}",
+                                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return int(json.load(r)["total"])
+    except Exception as e:  # noqa: BLE001  数が取れなくてもページは作る
+        print(f"訪問者数を受け取れなかった: {e}", file=sys.stderr)
+        return None
+
+
+def visitors_line(count, today):
+    if count is None:
+        return ""
+    d = datetime.date.fromisoformat(today) - datetime.timedelta(days=1)
+    return f'<p class="visitors">訪問者数 {count:,}人（{d.month}月{d.day}日時点）</p>'
 
 
 def plain(dish):
@@ -74,12 +102,14 @@ def main():
     items = [{k: r.get(k) for k in FIELDS} for r in recipes]
     published = [x for x in items if not x["added"] or x["added"] <= day]
     ones = [x for x in published if x["kind"] == "one"]
+    token = os.environ.get("GOATCOUNTER_TOKEN")
     template = (gyosu.ROOT / "site/template.html").read_text(encoding="utf-8")
     page = (template
             .replace("__JSONLD__", json_ld(published))
             .replace("__STATIC_TODAY__", static_today(ones[-1]) if ones else "")
             .replace("__ALL_COUNT__", str(len(published)))
             .replace("__ALL_LIST__", all_list(published))
+            .replace("__VISITORS__", visitors_line(visitors(token, day) if token else None, day))
             .replace("__DATA__", json.dumps(items, ensure_ascii=False)))
     out_html = "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n" \
                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" + page
