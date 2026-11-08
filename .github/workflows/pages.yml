@@ -1,4 +1,4 @@
-# main が変わったら、data/recipes.json からページを作って GitHub Pages に公開する。
+# main が変わった時と毎日0時過ぎに、data/recipes.json からページを作って GitHub Pages に公開する。
 name: ページの公開
 
 on:
@@ -9,6 +9,9 @@ on:
       - "site/**"
       - "scripts/build_site.py"
       - ".github/workflows/pages.yml"
+  schedule:
+    # 毎日 0:05（日本時間）に作り直す。その日までに載せた品を HTML とサイトマップに書き込むため（検索対策）
+    - cron: "5 15 * * *"
   workflow_dispatch:
 
 permissions:

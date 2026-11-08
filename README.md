@@ -25,7 +25,7 @@
 3. 載せる日が来ると、その朝から「今日の一品」と新着に出る
 4. 予定が残り2日分以下になると、Issue でお知らせが届く
 
-くわしくは `docs/automation.md`（最初に人がする設定もここ）。
+くわしくは `docs/automation.md`（最初に人がする設定もここ）。検索対策は `docs/seo.md`。
 
 ## ページの構成
 
@@ -49,7 +49,7 @@
 ## 名前
 
 - 表示名: **業スー酒場**、サブタイトル: **居酒屋の一品ネタ帳（非公式）**
-- リポジトリ: `uniiqcode/gyosu-sakaba`（ページの URL は `https://uniiqcode.github.io/gyosu-sakaba/` の予定）
+- リポジトリ: `uniiqcode/gyosu-sakaba`（ページの正式な URL は `https://uniiqcode.com/gyosu-sakaba/`。`uniiqcode.github.io/gyosu-sakaba/` からも転送される）
 - 同じ名前のお店・サイト・アカウントは見つからなかった。「業スー」は J-PlatPat で確認し問題なし（2026-10-30）
 - 業務スーパー公式に「居酒屋業スー」という特集ページがあり、名前が近い。そのため「非公式」をサブタイトルとページの下に必ず書く
 
