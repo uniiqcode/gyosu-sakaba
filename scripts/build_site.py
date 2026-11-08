@@ -14,6 +14,7 @@ import json
 import os
 import shutil
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -35,6 +36,9 @@ def visitors(token, today):
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return int(json.load(r)["total"])
+    except urllib.error.HTTPError as e:   # GoatCounter が返した説明も出す（原因を調べるため）
+        print(f"訪問者数を受け取れなかった: {e} {e.read()[:300].decode('utf-8', 'replace')}", file=sys.stderr)
+        return None
     except Exception as e:  # noqa: BLE001  数が取れなくてもページは作る
         print(f"訪問者数を受け取れなかった: {e}", file=sys.stderr)
         return None
