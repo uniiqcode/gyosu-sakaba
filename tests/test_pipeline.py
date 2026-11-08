@@ -209,6 +209,10 @@ class Seo(unittest.TestCase):
         ld = json.loads(build_site.json_ld(published))
         self.assertEqual((ld["@type"], ld["numberOfItems"], ld["itemListElement"][0]["url"]), ("ItemList", 1, "https://e.x/a"))
 
+    def test_visitors_line(self):
+        self.assertEqual(build_site.visitors_line(1234, "2026-11-09"), '<p class="visitors">訪問者数 1,234人（11月8日時点）</p>')
+        self.assertEqual(build_site.visitors_line(None, "2026-11-09"), "")   # 受け取れない日は書かない
+
     def test_sitemap_uses_canonical_url(self):
         self.assertIn("<loc>https://uniiqcode.com/gyosu-sakaba/</loc><lastmod>2026-11-08</lastmod>", build_site.sitemap("2026-11-08"))
 

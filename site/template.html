@@ -172,6 +172,7 @@ h2, .tab, .today .dish, .seas-head, .sub b { -webkit-text-stroke: .5px currentCo
 .seas-head { font-family: var(--brush); font-size: 24px; margin: 18px 0 6px; display: flex; gap: 10px; align-items: baseline }
 .seas-head small { font-family: var(--body); font-size: 13.5px; color: var(--muted) }
 
+.visitors { color: var(--fg); font-weight: 700 }
 footer { margin-top: 40px; border-top: 1px solid var(--line); padding-block: 18px 30px; font-size: 14.5px; color: var(--muted) }
 footer p { margin: 0 0 6px }
 </style>
@@ -224,6 +225,8 @@ footer p { margin: 0 0 6px }
     <p>業務スーパー（株式会社神戸物産）とは関係のない、非公式のページです。</p>
     <p>レシピは各リンク先のページに載っています。このページには料理名とリンクだけを載せています。</p>
     <p>［保存］はこのスマホのブラウザの中だけに残ります。機種やブラウザを変えると引き継がれません。</p>
+    __VISITORS__
+    <p>訪問者数は GoatCounter で数えています（個人を特定する情報は保存しません）。</p>
   </footer>
 </main>
 
@@ -408,3 +411,5 @@ document.addEventListener("click", e => {
   renderTabs(); renderMenu(); renderSets();
 });
 </script>
+<!-- 訪問者数を数える（GoatCounter。Cookie を使わない） -->
+<script data-goatcounter="https://gyosusakaba.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
