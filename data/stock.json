@@ -2344,5 +2344,39 @@
   "kind": "set",
   "hitote": false,
   "official": false
+ },
+ {
+  "id": "277f7fcff1",
+  "url": "https://www.youtube.com/watch?v=e_D5NoA_qvY",
+  "title": "業務スーパーで発見！冷凍庫に常備したい神食品7選",
+  "source": "youtube",
+  "channel": "生活色々発信アライグマ",
+  "posted": "2026-11-10",
+  "found": "2026-11-11",
+  "dish": "発見 冷凍庫に常備したい神食品7選",
+  "section": "未分類",
+  "item_group": "冷凍惣菜・加工品",
+  "gyosu_item": "焼き鳥",
+  "seasoning": null,
+  "kind": "set",
+  "hitote": true,
+  "official": false
+ },
+ {
+  "id": "cd812e2fae",
+  "url": "https://ameblo.jp/noripetit/entry-12984014383.html",
+  "title": "覚えておくと便利な裏技3選‼︎ 【水漬けパスタ】他",
+  "source": "blog",
+  "channel": "",
+  "posted": "2026-11-10",
+  "found": "2026-11-11",
+  "dish": "水漬けパスタ",
+  "section": "〆",
+  "item_group": "麺・粉もの",
+  "gyosu_item": "パスタ",
+  "seasoning": null,
+  "kind": "set",
+  "hitote": false,
+  "official": false
  }
 ]
