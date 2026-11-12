@@ -2378,5 +2378,39 @@
   "kind": "set",
   "hitote": false,
   "official": false
+ },
+ {
+  "id": "d33437f980",
+  "url": "https://www.youtube.com/watch?v=up7HIl_N_Uc",
+  "title": "11月11日(水)鶏もも肉とキャベツのピリ辛味噌炒め♯中華惣菜♯ピリ辛味噌炒め♯鶏もも肉♯キャベツ♯玉葱♯豆もやし♯スープジャー♯スープランチ #業務スーパー #料理 #お昼御飯のご紹介です",
+  "source": "youtube",
+  "channel": "爺ぃのお惣菜料理とお菓子作り",
+  "posted": "2026-11-11",
+  "found": "2026-11-12",
+  "dish": "11月11日 鶏もも肉とキャベツのピリ辛味噌炒め",
+  "section": "煮物",
+  "item_group": "冷凍惣菜・加工品",
+  "gyosu_item": "惣菜",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": true,
+  "official": false
+ },
+ {
+  "id": "0bb25555f1",
+  "url": "https://note.com/grand_arnica8909/n/n83d622e180eb",
+  "title": "「業務スーパー」業スー米粉活用術！米粉×豆乳でしっとり！優しい甘さの米粉まるパンレシピ！",
+  "source": "blog",
+  "channel": "",
+  "posted": "2026-11-11",
+  "found": "2026-11-12",
+  "dish": "米粉活用術 米粉 豆乳でしっとり 優しい甘さの米粉まるパン",
+  "section": "未分類",
+  "item_group": "肉",
+  "gyosu_item": "とり",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": false
  }
 ]
