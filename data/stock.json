@@ -2871,5 +2871,39 @@
   "kind": "set",
   "hitote": false,
   "official": false
+ },
+ {
+  "id": "2dac909c88",
+  "url": "https://www.youtube.com/watch?v=sqxWmpFzW4s",
+  "title": "業務スーパーで発見！冷凍庫に常備したい神食品7選 #shorts",
+  "source": "youtube",
+  "channel": "生活色々発信アライグマ",
+  "posted": "2026-11-10",
+  "found": "2026-11-21",
+  "dish": "発見 冷凍庫に常備したい神食品7選",
+  "section": "未分類",
+  "item_group": "冷凍惣菜・加工品",
+  "gyosu_item": "焼き鳥",
+  "seasoning": null,
+  "kind": "set",
+  "hitote": true,
+  "official": false
+ },
+ {
+  "id": "172185973e",
+  "url": "https://www.youtube.com/watch?v=mRCK8FJ4Jq4",
+  "title": "業スー最強おつまみで晩酌を安く簡単に楽しむテクを挙げてけ",
+  "source": "youtube",
+  "channel": "2ch生活まとめ",
+  "posted": "2026-11-20",
+  "found": "2026-11-21",
+  "dish": "最強おつまみで晩酌を安く簡単に楽しむテクを挙げてけ",
+  "section": "未分類",
+  "item_group": "いろいろ",
+  "gyosu_item": "",
+  "seasoning": null,
+  "kind": "one",
+  "hitote": false,
+  "official": false
  }
 ]
