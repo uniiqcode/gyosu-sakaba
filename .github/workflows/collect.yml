@@ -1,6 +1,7 @@
 # 毎朝、新しい動画・記事を集めてストックにためる。PR は作らない。
 # 集めた結果（ストック・一度見た URL）は main ではなく collect-data ブランチに記録する。
-# 予定（main の data/recipes.json）が残り2日分以下になったら、7日分の候補の PR を自動で作り、Issue でお知らせする。
+# 予定（main の data/recipes.json）が残り4日分以下になったら、7日分の候補の PR を自動で作り、Issue でお知らせする。
+# 残り1日分になってもマージされていなければ、更新を止めないよう自動でマージする。
 name: 毎日の収集
 
 on:
@@ -11,7 +12,8 @@ on:
 permissions:
   contents: write
   issues: write
-  actions: write   # 予定が残り少ない時に「7日分の候補を出す」を動かすため
+  pull-requests: write   # 候補の PR を自動でマージするため
+  actions: write   # 「7日分の候補を出す」と「ページの公開」を動かすため
 
 concurrency:
   group: collect
@@ -64,28 +66,49 @@ jobs:
           git commit -m "収集 $(TZ=Asia/Tokyo date +%F)" || echo "変わったところはない"
           git push origin "$DATA_BRANCH"
 
-      - name: 予定が残り2日分以下なら、7日分の候補を作ってお知らせする
+      - name: 予定が残り少なければ候補の PR を作り、それでもマージされなければ自動で入れる
         env:
           GH_TOKEN: ${{ github.token }}
+          PROPOSE_AT: "4"     # 残りがこの日数以下になったら、7日分の候補の PR を作る（確かめて直す時間を取るため早めに）
+          AUTOMERGE_AT: "1"   # 残りがこの日数以下になっても PR がマージされていなければ、自動でマージする（更新を止めないため）
         run: |
           left=$(python3 scripts/remaining.py)
           stock=$(python3 -c "import json;print(sum(x['kind']=='one' for x in json.load(open('data/stock.json'))))")
           title="【業スー酒場】予定が残り少なくなりました"
           open=$(gh issue list --state open --search "in:title 予定が残り少なく" --json number --jq '.[0].number')
           pr=$(gh pr list --state open --head propose-days --json number --jq '.[0].number')
-          if [ "$left" -le 2 ]; then
-            # 候補の PR がまだなければ作る（あれば作り直さない。確かめている途中の PR を消さないため）
+          note=""
+          if [ "$left" -le "$AUTOMERGE_AT" ]; then
+            if [ -n "$pr" ]; then
+              # 期限までにマージされなかったので、自動でマージする。Actions のマージでは「ページの公開」が動かないので、続けて動かす
+              if gh pr merge "$pr" --merge --subject "候補の PR #${pr} を自動でマージ（予定が残り ${left} 日分のため）"; then
+                gh pr comment "$pr" --body "予定が残り ${left} 日分になってもマージされていなかったので、更新を止めないよう自動でマージしました。直したい品があれば、data/recipes.json を直す PR を作るか、Claude に頼んでください。"
+                gh workflow run pages.yml
+                note="候補の PR #${pr} がマージされていなかったので、自動でマージしました。直したい品があれば、あとから直せます。"
+              else
+                note="候補の PR #${pr} を自動でマージできませんでした（ぶつかる変更があるかもしれません）。PR を開いて確かめてください。"
+              fi
+            else
+              # PR がまだない（作るのに失敗した時など）。作ったらすぐマージするよう頼む
+              gh workflow run propose.yml -f days=7 -f merge=yes
+              note="予定が切れそうなので、7日分の候補を作ってそのまま入れます（数分で反映されます）。直したい品があれば、あとから直せます。"
+            fi
+          elif [ "$left" -le "$PROPOSE_AT" ]; then
             if [ -z "$pr" ]; then
               gh workflow run propose.yml -f days=7
               note="7日分の候補の PR を自動で作りました（数分で届きます）。確かめてマージしてください。"
             else
               note="7日分の候補の PR（#${pr}）ができています。確かめてマージしてください。"
             fi
+            note="${note}
+          残りが ${AUTOMERGE_AT} 日分になってもマージされていなければ、自動でマージします。"
+          fi
+          if [ -n "$note" ]; then
             body="明日以降の予定が、あと ${left} 日分です（ストックの1品は ${stock} 件）。
-          ${note}
-          PR をマージすると、このお知らせは次の収集の時に自動で閉じます。"
+          ${note}"
+            # お知らせは1つにまとめ、毎朝の様子はコメントで足す（通知を出し直すため）
             if [ -z "$open" ]; then gh issue create --title "$title" --body "$body"
-            elif [ -z "$pr" ]; then gh issue comment "$open" --body "$body"; fi
+            else gh issue comment "$open" --body "$body"; fi
           elif [ -n "$open" ]; then
             gh issue close "$open" --comment "予定が ${left} 日分に増えたので閉じます。"
           fi

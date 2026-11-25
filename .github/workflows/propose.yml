@@ -9,10 +9,15 @@ on:
         description: "何日分出すか"
         default: "7"
         required: true
+      merge:
+        description: "作った PR をすぐマージするか（予定が切れそうな時に、毎日の収集が yes で動かす）"
+        default: "no"
+        required: false
 
 permissions:
   contents: write
   pull-requests: write
+  actions: write   # すぐマージした時に「ページの公開」を動かすため
 
 concurrency:
   group: propose
@@ -45,7 +50,8 @@ jobs:
         id: day
         run: echo "day=$(TZ=Asia/Tokyo date +%F)" >> "$GITHUB_OUTPUT"
 
-      - uses: peter-evans/create-pull-request@v7
+      - id: cpr
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: propose-days
           delete-branch: true
@@ -54,3 +60,14 @@ jobs:
           commit-message: "${{ github.event.inputs.days }}日分の候補"
           add-paths: |
             data/recipes.json
+
+      - name: すぐマージする（予定が切れそうな時だけ）
+        if: github.event.inputs.merge == 'yes' && steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          gh pr merge "$PR" --merge --subject "候補の PR #${PR} を自動でマージ（予定が切れそうなため）"
+          gh pr comment "$PR" --body "予定が切れそうだったので、作ってすぐ自動でマージしました。直したい品があれば、data/recipes.json を直す PR を作るか、Claude に頼んでください。"
+          # Actions のマージでは「ページの公開」が動かないので、続けて動かす
+          gh workflow run pages.yml
