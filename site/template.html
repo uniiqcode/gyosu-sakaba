@@ -50,6 +50,9 @@
   --brush: "Yuji Syuku", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --marker: "Yusei Magic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;   /* 短冊の品書き（太いマジックの手書き） */
   --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  /* 右上の i（ホーム画面に追加する方法。uniiqcode の共通部品 assets/home-guide.js）の色: 藍ののれんと白壁 */
+  --hg-accent: var(--ai); --hg-btn-bg: rgba(244, 242, 236, .92); --hg-card: var(--ai-fg); --hg-ink: var(--fg);
+  --hg-sub: var(--muted); --hg-line: var(--line); --hg-field: var(--bg); --hg-on-accent: var(--ai-fg);
 }
 * { box-sizing: border-box }
 /* 白壁: 大きくゆるいシミのムラと、漆喰の細かいざらつきを重ねる */
@@ -416,3 +419,6 @@ document.addEventListener("click", e => {
 <!-- 「ホーム画面に追加」ボタン（uniiqcode のアプリ共通の部品。uniiqcode/uniiqcode.github.io の assets/a2hs.js）。
      Android・パソコンは押すと追加の確認、iPhone は手順の案内。ホーム画面から開いた時は出ない -->
 <script src="https://uniiqcode.com/assets/a2hs.js" data-app="業スー酒場" defer></script>
+<!-- 右上の i: ホーム画面に追加する方法と URL のコピー（uniiqcode のアプリ共通の部品。uniiqcode/uniiqcode.github.io の assets/home-guide.js）。
+     LINE などのアプリ内で開いた人に、Chrome／Safari で開き直すよう案内する -->
+<script src="https://uniiqcode.com/assets/home-guide.js" data-app="業スー酒場" data-url="https://uniiqcode.com/gyosu-sakaba/" defer></script>
